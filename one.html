@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCRE Level 2 选择题训练</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        /* 顶部控制区（套题选择+成绩） */
+        .top-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* 套题选择下拉框 */
+        .paper-select {
+            padding: 8px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #34495e;
+            cursor: pointer;
+        }
+
+        /* 成绩统计按钮 */
+        .score-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #9b59b6;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .score-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* 标题样式 */
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* 题目区域 */
+        .question-area {
+            margin-bottom: 40px;
+        }
+
+        .question-title {
+            font-size: 18px;
+            color: #34495e;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+
+        /* 代码块样式（新增） */
+        .question-title pre {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* 选项样式 */
+        .options {
+            list-style: none;
+        }
+
+        .option-item {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e3f2fd;
+            border-color: #3498db;
+        }
+
+        .option-item.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .option-item.correct {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .option-item.wrong {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        /* 按钮区域 */
+        .btn-area {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .next-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .submit-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* 题号导航 */
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-item {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .nav-item.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .nav-item.completed {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        /* 答题反馈 */
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .feedback.correct {
+            background-color: #d5f5e3;
+            color: #27ae60;
+            display: block;
+        }
+
+        .feedback.wrong {
+            background-color: #fadbd8;
+            color: #c0392b;
+            display: block;
+        }
+
+        /* 成绩弹窗样式 */
+        .score-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .score-info {
+            font-size: 18px;
+            margin: 15px 0;
+            color: #34495e;
+        }
+
+        .score-num {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .close-modal:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部控制区：套题选择 + 成绩统计 -->
+    <div class="top-control">
+        <select class="paper-select" id="paper-select">
+            <option value="paper1">第1套题</option>
+            <option value="paper2">第2套题</option>
+            <option value="paper3">第3套题</option>
+            <option value="paper4">第4套题</option>
+            <option value="paper5">第5套题</option>
+        </select>
+        <button class="score-btn" id="score-btn">查看成绩统计</button>
+    </div>
+
+    <!-- 标题 -->
+    <div class="title">NCRE Level 2 选择题专项训练（第1套）</div>
+
+    <!-- 题目区域 -->
+    <div class="question-area">
+        <div class="question-title" id="question-title">0101 - 请选择正确的选项</div>
+        <ul class="options" id="options">
+            <li class="option-item" data-value="A">A. 选项A</li>
+            <li class="option-item" data-value="B">B. 选项B</li>
+            <li class="option-item" data-value="C">C. 选项C</li>
+            <li class="option-item" data-value="D">D. 选项D</li>
+        </ul>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- 按钮区域 -->
+    <div class="btn-area">
+        <button class="btn prev-btn" id="prev-btn" disabled>上一题</button>
+        <button class="btn submit-btn" id="submit-btn">提交答案</button>
+        <button class="btn next-btn" id="next-btn">下一题</button>
+    </div>
+
+    <!-- 题号导航 -->
+    <div class="question-nav" id="question-nav">
+        <!-- 题号会通过JS动态生成 -->
+    </div>
+</div>
+
+<!-- 成绩统计弹窗 -->
+<div class="score-modal" id="score-modal">
+    <div class="modal-content">
+        <div class="modal-title">答题成绩统计</div>
+        <div class="score-info">总题数：<span class="score-num" id="total-questions">0</span></div>
+        <div class="score-info">已答题数：<span class="score-num" id="answered-questions">0</span></div>
+        <div class="score-info">答对题数：<span class="score-num" id="correct-questions">0</span></div>
+        <div class="score-info">正确率：<span class="score-num" id="correct-rate">0%</span></div>
+        <button class="close-modal" id="close-modal">关闭</button>
+    </div>
+</div>
+
+<script>
+    // 1. 多套题题库数据（可扩展更多套题）
+    const allPaperData = {
+        paper1: {
+            name: "第1套题",
+            questions: [
+                 {
+                    id: "0101",
+                    title: "0101 - 计算机完成一条指令所花费的时间称为一个(    )",
+                    options: { A: "执行时序", B: "存取周期", C: "执行速度", D: "指令周期" },
+                    answer: "D",
+                    analysis: "一般把计算机完成一条指令所花费的时间称为一个指令周期。指令周期越短，指令执行就减快。"
+                },
+                {
+                    id: "0102",
+                    title: "0102 - 顺序程序不具有(    )",
+                    options: { A: "顺序性", B: "并发性", C: "封闭性", D: "可再现性" },
+                    answer: "B",
+                    analysis: "顺序程序具有顺序性、封闭性和可再现性的特点，使得程序设计者能够控制程序执行的过程（包括执行顺序、执行时间），对程序执行的中间结果和状态可以预先估计，这样就可以方便地进行程序的测试和调试。顺序程序不具有并发性。并发性是并发程序的特点。"
+                },
+                {
+                    id: "0103",
+                    title: "0103 - 下列叙述中正确的是(    )",
+                    options: { A: "算法的复杂度与问题的规模无关", B: "算法的优化主要通过程序的编制技巧来实现", C: "对数据进行压缩存储会降低算法的空间复杂度", D: "数值型算法只需考虑计算结果的可靠性" },
+                    answer: "C",
+                    analysis: "为了降低算法的空间复杂度，主要应减少输入数据所占的存储空间以及额外空间，通常采用压缩存储技术，故C选项叙述正确。算法的计算工作量是用算法所执行的基本运算次数来度量的，而算法所执行的基本运算次数是问题规模（通常用整数）表示的函数，故A选项叙述错误。算法的复杂度与程序的编制无关、故B选项叙述错误。算法需要考虑可行性、确定性、有穷性等，故D选项叙述错误。本题选择C选项。"
+                },
+                {
+                    id: "0104",
+                    title: "0104 - 设有一个栈与一个队列的初始状态均为空。现有一个序列A,B,C,D,E,F,G,H。先分别将序列中的前4个元素依次入栈，后4个元素依次入队；然后分别将栈中的元素依次退栈，再将队列中的元素依次退队。最后得到的序列为(    )。",
+                    options: { A: "A,B,C,D,E,F,G,H", B: "A,B,C,D,H,G,F,E", C: "D,C,B,A,H,G,F,E", D: "D,C,B,A,E,F,G,H" },
+                    answer: "D",
+                    analysis: "栈按先进后出的原则组织数据，所以入栈最早的元素最后出栈。队列按先进先出的原则组织数据，所以入队最早的元素最先退队。入栈的顺序为A,B,C,D，则退栈的顺序为D,C,B,A；入队的顺序为E、F、G、H，退队的顺序为E,F,G,H。本题选择D选项。"
+                },
+                {
+                    id: "0105",
+                    title: "0105 - 设某棵树的度为3，其中度为3,2,1的节点个数分别为3,0,4。则该树中的叶子节点数为(    )。",
+                    options: { A: "6", B: "7", C: "8", D: "不可能有这样的树" },
+                    answer: "B",
+                    analysis: "假设叶子节点个数为n。这棵树的总节点数为度为3的节点数＋度为2的节点数＋度为1的节点数＋度为0的节点数，即3+0+4+n。再根据树的性质：树的总的节点数为树中所有节点的度数之和再加1，则总节点数为3×3+2×0+1×4+0×n+1。3×3+1×4+1=3+4+n，则n=7，叶子节点数为7。本题选择B选项。"
+                },
+                {
+                    id: "0106",
+                    title: "0106 - 结构化程序设计强调(    )。",
+                    options: { A: "程序的效率", B: "程序的规模", C: "程序的易读性", D: "程序的可复用性" },
+                    answer: "C",
+                    analysis: "结构化程序设计的目的：通过设计结构良好的程序，以程序静态的、良好的结构保证程序动态执行的正确性，使程序易理解、易调试、易维护，以提高软件开发的效率，降低出错率，因此结构化程序强调程序的易读性。本题选择C选项。"
+                },
+                {
+                    id: "0107",
+                    title: "0107 - 下面不属于系统软件的是(    )。",
+                    options: { A: "杀毒软件", B: "操作系统", C: "编译程序", D: "数据库管理系统" },
+                    answer: "A",
+                    analysis: "系统软件是管理计算机的资源、提高计算机的使用效率、为用户提供各种服务的软件，如操作系统、数据库管理系统、编译程序、汇编程序和网络软件等，B、C和D选项均属于系统软件。应用软件是为了应用于特定的领域而开发的软件，A属于应用软件。本题选择A选项。"
+                },
+                {
+                    id: "0108",
+                    title: "0108 - 在数据库管理技术发展的3个阶段中，没有专门的软件对数据进行管理的是(    ) 。",
+                    options: { A: "人工管理阶段", B: "文件系统阶段", C: "文件系统阶段和数据库系统阶段", D: "人工管理阶段和文件系统阶段" },
+                    answer: "A",
+                    analysis: "数据库管理技术的3个阶段是人工管理阶段、文件系统阶段和数据库系统阶段。人工管理阶段没有专门的软件对数据进行管理。本题选择A选项。"
+                },
+                {
+                    id: "0109",
+                    title: "0109 - 建立表示学生选修课程活动的实体联系模型，其中的两个实体分别是(    )。",
+                    options: { A: "学生和学号", B: "课程和成绩", C: "学生和课程", D: "课程和课程号" },
+                    answer: "C",
+                    analysis: "在实体联系模型中，实体是客观存在并且可以相互区别的事物。在学生选修课程活动中，学生和课程是客观存在并且可以相互区别的事物，课程号是课程的属性，学号是学生的属性，成绩是学生和课程联系的属性。本题选择C选项。"
+                },
+                {
+                    id: "0110",
+                    title: "0110 - 定义学生选修课程的关系模式如下:SC(S#,Sn,C#,Cn,T#,G,Cr)（其属性分别为学号、姓名、课程号、课程名、授课老师号、成绩、学分）并且一门课程可由多个教师教授，则该关系的键是(    )。",
+                    options: { A: "S#,T#", B: "S#,C#", C: "S#", D: "C#" },
+                    answer: "B",
+                    analysis: '在关系SC中，想要唯一确定一行，需要学号"S＃"和课程号"C＃"。不管该课程的授课老师是谁，只要知道了学号和课程号，就能确定关系中的其他属性。因此，该关系的键是"S＃"和"C＃"。本题选择B选项。'
+                },
+                {
+                    id: "0111",
+                    title: "0111 - 在Python中，不能作为变量名的是(    )。",
+                    options: { A: "student", B: "_bmg", C: "5sp", D: "Teacher" },
+                    answer: "C",
+                    analysis: "在Python中，变量的命名规则：以字母或下划线开头，后面跟字母、下划线及数字；不能以数字开头。本题选择C选项。"
+                },
+                {
+                    id: "0112",
+                    title: "0112 - 以下关于Python缩进的描述中，错误的是(    )。",
+                    options: { A: "缩进表达了所属关系和代码块的所属范围", B: "缩进是可以嵌套的，从而形成多层缩进", C: "判断、循环、函数等都能够通过缩进包含一批代码", D: "Python 用严格的缩进表示程序的格式框架，所有代码都需要在行前至少加一个空格" },
+                    answer: "D",
+                    analysis: "缩进是指在逻辑行首的空白（空格符或制表符），用来决定逻辑行的缩进层次，从而决定语句的分组。这意味着同一层次的语句必须有相同的缩进，不是同一层次的语句不需要有相同的缩进。所以，不是所有代码行前都要加空格符。本题选择D选项。"
+                },
+                {
+                    id: "0113",
+                    title: "0113 - 以下代码的输出结果是(    )。<br>x='R\\0S\\0T'<br>print(len(x))",
+                    options: { A: "3", B: "5", C: "7", D: "6" },
+                    answer: "B",
+                    analysis: "变量 x = 'R\\0S\\0T' 包含的字符依次是：'R'、'\\0'、'S'、'\\0'、'T'，一共 5 个字符，所以 len(x) 的结果是 5。本题选择B选项。"
+                },
+                {
+                    id: "0114",
+                    title: "0114 - 以下关于Python的描述中，错误的是(    )。",
+                    options: { A: "对于需要更高执行速度的功能，如数值计算和动画，Python可以调用C语言编写的底层代码", B: "Python 比大部分编程语言具有更高的软件开发产量和简洁性", C: "Python是解释执行型语言，因此执行速度比编译型语言慢", D: "Python是脚本语言，主要用作系统编程和Web开发的开发语言" },
+                    answer: "D",
+                    analysis: "答案为 D，其中 A、B、C 均为正确描述 ——Python 可通过 ctypes、Cython 等方式调用 C 语言代码提升执行速度，其语法简洁、内置功能丰富的特性使其开发效率高、软件开发产量更高，且作为解释型语言，它的执行速度通常慢于 C/C++ 等编译型语言；而 D 选项错误，尽管 Python 属于脚本语言，但它的应用场景极为广泛，数据分析、人工智能、自动化运维等均是其核心应用领域，系统编程和 Web 开发并非其主要用途。"
+                },
+                {
+                    id: "0115",
+                    title: "0115 - 以下代码的输出结果是(    ).\nx=12+3*((5*8)-14)//6\nprint(x)",
+                    options: { A: "25.0", B: "65", C: "25", D: "24" },
+                    answer: "C",
+                    analysis: "在Python中，算术运算符'//'表示整数除法，返回不大于结果的一个最大的整数；'/'表示浮点数除法，返回浮点数结果。所以依次计算5*8=40, 40-14=26, 3*26=78, 78//6=13, 12+13=25。本题选择C选项。"
+                },
+                {
+                    id: "0116",
+                    title: "0116 - 以下关于Tython循环结构的描述中，错误的是(    ) 。",
+                    options: { A: "break 用来结束当前的循环语句，但不跳出当前的循环体", B: "遍历循环中的遍历结构可以是字符串、文件、组合数据类型及range()函数等", C: "Python 通过for、while 等保留字构建循环结构", D: "continue 只结束本次循环" },
+                    answer: "A",
+                    analysis: "在Python中，break 用于结束循环，continuc 用于结束当前循环并进入下一个循环。本题选择A选项。"
+                },
+                {
+                    id: "0117",
+                    title: "0117 - 以下构成Python 循环结构的语句中，正确的是(    )。",
+                    options: { A: "while", B: "loop", C: "if", D: "do-for" },
+                    answer: "A",
+                    analysis: "Python中的循环结构语句有for语句和while 语句。if是选择结构语句。本题选择A选项。"
+                },
+                {
+                    id: "0118",
+                    title: "0118 - 以下Python代码绘制的图形是(    )。\nimport turtle as t\nfor i in range(1,7):\n    t.fd(50)\n    t.left(60)",
+                    options: { A: "正方形", B: "六边形", C: "三角形", D: "五角星" },
+                    answer: "B",
+                    analysis: "代码解析：\n1. import turtle as t：导入turtle绘图库并简写为t；\n2. for i in range(1,7)：循环执行6次（i取1-6）；\n3. t.fd(50)：画笔向前移动50像素；\n4. t.left(60)：画笔向左旋转60度。\n6次循环总旋转角度：6×60°=360°，且每次前进距离相同，因此绘制出的是正六边形。本题选择B选项。"
+                },
+                {
+                    id: "0119",
+                    title: "0119 - 以下关于Python的描述中，正确的是(    )。",
+                    options: { A: "条件4<=5<=6是合法的，输出False", B: "条件4<=5<=6是不合法的", C: "条件4<=5<=6是合法的，输出True", D: "条件4<=5<=6是不合法的，抛出异常" },
+                    answer: "C",
+                    analysis: "条件4<=5<=6是成立的，故输出True。本题选择C选项。"
+                },
+                {
+                    id: "0120",
+                    title: "0120 - 以下代码的输出结果是(    )<br>for i in range(1,6):<br>&nbsp;&nbsp;&nbsp;&nbsp;if i%4==0:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(i,end=\",\")",
+                    options: {  A: "1,2,3", B: "1,2,3,4,", C: "1,2,3,5,", D: "1,2,3,5,6," },
+                    answer: "C",
+                    analysis: "for循环依次将1~5赋值给变量i,i依次为1、2、3、4、5。当i%4==0时，结束本次循环进入下一循环；反之输出i的值，故输出1、2、3、5。本题选择C选项。"
+                },
+                {
+                    id: "0121",
+                    title: "0121 -以下代码的输出结果是(    ) 。<br>t=10.5<br>def above_zero(t):<br>&nbsp;&nbsp;&nbsp;&nbsp;return t>0<br>",
+                    options: { A: "True", B: "False", C: "10.5", D: "没有输出"},
+                    answer: "D",
+                    analysis: "在Python中，return 语句用来结束函数并将程序返回函数被调用的位置继续执行。语句可以出现在函数中的任何部分，可以同时将0个、1个或多个函数运算结果返回给函数被调用处的变量函数也可以没有return语句，此时函数没有返回值。题目中，return语句返回的是值而不是表达式.故程序无输出。本题选择D选项。"
+                },
+                {
+                    id: "0122",
+                    title: "0122 - 以下关于Python的描述中，正确的是(    )。",
+                    options: {A: "函数中return语句只能放在函数定义的最后面", B: "定义函数需要使用保留字def", C: "函数最主要的作用是复用代码", D: "Python 函数不可以定义在分支或循环语句的内部"  },
+                    answer: "B",
+                    analysis: "在Python中，函数通过关键字def来定义，这是Python的保留字。return语句可以出现在函数中的任何位置，不是只能放在最后；函数的主要作用不仅是代码复用，还包括提高程序模块性；Python允许在分支或循环语句内部定义函数（局部函数）。本题选择B选项。"
+                },
+                {
+                    id: "0123",
+                    title: "0123 - 以下代码的输出结果是(    )。<br>def young(age):<br>&nbsp;&nbsp;&nbsp;&nbsp;if 25<=age<=30:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"作为一个老师，你很年轻\")<br>&nbsp;&nbsp;&nbsp;&nbsp;elif age <25:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"作为一个老师，你太年轻了\")<br>&nbsp;&nbsp;&nbsp;&nbsp;elif age>=60:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"作为一个老师，你可以退休了\")<br>&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"作为一个老师，你很有爱心\")<br>young(42)",
+                    options: { A: "作为一个老师，你很年轻", B: "作为一个老师，你太年轻了", C: "作为一个老师，你可以退休了", D: "作为一个老师，你很有爱心"  },
+                    answer: "D",
+                    analysis: '将实参42传递给函数形参变量age，之后进入多分支结构，依次判断：42不在25到30之间，42不小于25，42也不大于等于60，因此执行else后面的语句，即输出"作为一个老师，你很有爱心"。本题选择D选项。'
+                },
+                {
+                    id: "0124",
+                    title: "0124 - 以下代码的输出结果是(    )。<br>def fibRate(n):<br>&nbsp;&nbsp;&nbsp;&nbsp;if n<=0:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -1<br>&nbsp;&nbsp;&nbsp;&nbsp;elif n==1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -1<br>&nbsp;&nbsp;&nbsp;&nbsp;elif n==2:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 1<br>&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L=[1,5]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for i in range(2,n):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L.append(L[-1]+L[-2])<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return L[-2]%L[-1]<br>print(fibRate(7))",
+                    options: { A: "0.6", B: "28", C: "-1", D: "1"  },
+                    answer: "B",
+                    analysis: "将实参7传递给函数形参变量n，之后进入多分支结构，依次判断后，执行else后的语句。for语句为for i in range(2,7),i从2依次变化到6，循环5次，将L[-1]+L[-2]的值通过append方法添加到列表L中。<br>" +
+                        "当i=2时,L[-1]+L[-2]=5+1=6，将6添加到列表L中，此时L=[1,5,6];" +
+                        "当i=3时,L[-1]+L[-2]=6+5=11，将11添加到列表L中，此时L=[1,5,6,11];" +
+                        "当i=4时，L[-1]+L[-2]=11+6=17，将17添加到列表L中，此时L=[1,5,6,11,17];" +
+                        "当i=5时，L[-1]+L[-2]=17+11=28，将28添加到列表L中，此时L=[1,5,6,11,17,28];" +
+                        "当i=6时,L[-1]+L[-2]=28+17=45,将45添加到列表L中,此时L=[1,5,6,11,17,28,45]." +
+                        "最后L[-2]%L[-1]=28%45=28，故程序输出28。本题选择B选项。"
+                },
+                {
+                    id: "0125",
+                    title: "0125 -以下关于函数返回值的描述中，正确的是(    )。",
+                    options: {A: "Python 函数的返回值个数很灵活，可以没有返回值，也可以有一个或多个返回值",B:"函数定义中最多含有一条return语句",C:"在函数定义中使用return语句时，至少有一个返回值",D:"函数只能通过print语句和return 语句给出运行结果 "},
+                    answer: "A",
+                    analysis: "在Python中，return 语句用来结束函数并将程序返回函数被调用的位置继续执行；语句可以出现在函数中的任何部分，可以同时将0个、1个或多个函数运算结果返回给函数被调用处的变量函数可以没有return语句，此时函数没有返回值。当函数使用return语句返回多个值时，这些值形成了一个元组数据类型，由圆括号和逗号分隔，如(a,b,c)，可以使用一个变量或多个变量保存结果。本题选择A选项。"
+                },
+                {
+                    id: "0126",
+                    title: "0126 - 以下代码的输出结果是(    )。<br>def Hello(familyName,age):<br>&nbsp;&nbsp;&nbsp;&nbsp;if age>50:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"您好!\"+familyName+\"奶奶\")<br>&nbsp;&nbsp;&nbsp;&nbsp;elif age>40:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"您好!\"+familyName+\"阿姨\")<br>&nbsp;&nbsp;&nbsp;&nbsp;elif age>30:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"您好!\"+familyName+\"姐姐\")<br>&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(\"您好!\"+\"小\"+familyName)<br>Hello(age=43,familyName=\"赵\")",
+                    options: {A: "您好！赵奶奶", B: "您好！赵阿姨", C: "您好！赵姐姐", D: "函数调用出错" },
+                    answer: "B",
+                    analysis: "将实参age=43、familyName=\"赵\"分别赋给形参age和familyName，之后进入多分支结构进行判断。因为40<age=43<50，执行第一个elif后面的语句，用加号进行字符串连接，故输出\"您好！赵阿姨\"。本题选择B选项。"
+                },
+                {
+                    id: "0127",
+                    title: "以下代码的输出结果是(     ) 。<br>ls =[[1,2,3],'python',[[4,5,'ABC'],6],[7,8]]<br>print(ls[2][1])",
+                    options: {A: "'ABC'", B: "p", C: "4", D: "6" },
+                    answer: "D",
+                    analysis: "列表索引从0开始，所以ls[2][1]指的是列表中索引为2的元素[[4,5,'ABC'],6]中索引为1的元素6，所以输出结果是6。本题选择D选项。"
+                },
+                {
+                    id: "0128",
+                    title: "0128 - 以下代码的输出结果是(     ) 。<br>ls=['2020','1903','Python']<br>ls.append(2050)<br>ls.append([2020,'2020'])<br>print(ls)",
+                    options: { A: "['2020', '1903', 'Python', 2020,[2050,'2020']]", B: "['2020', '1903', 'Python', 2020]", C: "['2020', '1903', 'Python', 2050, [2020, '2020']]", D: "['2020', '1903', 'Python',2050,['2020']]" },
+                    answer: "C",
+                    analysis: "要向列表中添加元素，可以使用append()方法，添加的元素的类型可以不同，如可以是数字、字符串、列表等类型。需要注意的是，append()方法不能同时添加多个元素。本题选择C选项。"
+                },
+                {
+                    id: "0129",
+                    title: "0129 - d={'大海':'蓝色','天空':'灰色','大地':'黑色'}<br>print(d['大地'],d.get('天空','黄色'))",
+                    options: { A: "黑色 黑色", B: "黑色 灰色", C: "黑色 黄色", D: "黑色 蓝色" },
+                    answer: "B",
+                    analysis: "在Python中，字典是存储可变数量键值对的数据结构，通过字典类型实现映射。字典使用花括号（{}）创建，每个元素是一个键值对，语法格式为：{＜键1>:＜值1>, ＜键2>:＜值2＞,..., ＜键n>:＜值n>}，其中，键和值通过冒号连接，不同键值对通过逗号隔开。字典具有和集合类似的性质，即键值对之间没有顺序且不能重复。本题中，d［键］用来获取键对应的值，d.get(key,default）方法用来返回key对应的值。如果字典中不存在该键，则返回默认值。本题选择B选项。"
+                },
+                {
+                    id: "0130",
+                    title: "0130 - 以下关于序列类型的描述中，正确的是(     ) 。",
+                    options: { A: "序列类型是一维元素向量，元素之间存在先后关系，通过索引访问", B: "序列类型可以分为3类：字符串、字典及列表", C: "表示组合数据的类型被称为基本数据类型", D: "Python的字符串、元组及列表都属于序列类型" },
+                    answer: "A",
+                    analysis: "序列类型是一维元素向量，元素间存在先后关系，通过索引访问，故A选项正确。Python的重要数据类型是序列类型，其中比较重要的是字符串类型、列表类型及元组类型。字典是存储可变数量值对的数据结构，通过字典类型实现映射，所以字典是映射类型，不是序列类型。故B、D两项错误。表示多个数据的类型被称为组合数据类型，故C选项错误。本题选择A选项。"
+                },
+                {
+                    id: "0131",
+                    title: "0131 - 以下代码的输出结果是(    )。<br>d = {}<br>for i in range(26):<br>&nbsp;&nbsp;&nbsp;&nbsp;d[chr(ord('A')+i)] = chr((i+13)%26+ord('A'))<br>for c in \"Python\":<br>&nbsp;&nbsp;&nbsp;&nbsp;print(d.get(c,c), end='')",
+                    options: { A: "Plguba", B: "Cabugl", C: "Python", D: "Cython" },
+                    answer: "D",
+                    analysis: "这段代码通过构建 ROT13 映射字典，将字符串 “Python” 中的大写字母P转换为C，其余小写字母保持不变，最终输出Cython。"
+                },
+                {
+                    id: "0132",
+                    title: "0132 - 以下关于Python二维数据的描述中，错误的是(    )",
+                    options: { A: "CSV文件的每一行是一维数据，可以用列表、元组表示", B: "从CSV文件获得数据内容后，可以用replace()去掉每行最后的换行符", C: "若一个列表变量里的元素都是字符串类型，则可以用join()合成字符串", D: "列表中保存的二维数据，可以通过循环结构用writelines()写入CSV文件" },
+                    answer: "D",
+                    analysis: "在Python中，writelines()方法是将一个所有元素为字符串的列表整体写入文件；write()方法是向文件写入一个字符串或字节流。在将二维列表对象输出为CSV文件时，可以采用遍历循环结合字符串的join()方法来实现。本题选择D选项。"
+                },
+                {
+                    id: "0133",
+                    title: "0133 -以下关于文件的描述中，错误的是(     ) 。",
+                    options: { A: "文件是存储在外存上的一组数据序列，可以包含任何数据内容", B: "可以使用open()打开文件，使用close()关闭文件", C: "使用read()可以从文件中读入全部内容", D: "使用readlines()可以从文件中读入一行内容" },
+                    answer: "D",
+                    analysis: "文件是存储在外存上的一组数据序列，可以包含任何数据内容，故A选项正确。可以使用open()函数打开文件、close()方法关闭文件，故B选项正确。在Python中，文件的读取方法（f代表文件变量）如下。f.read()：从文件中读取全部内容。f.readline()：从文件中读取一行内容。f.readlines()：从文件中读取所有行，以每行内容为元素形成一个列表。综上，C选项正确，D选项错误。本题选择D选项。"
+                },
+                {
+                    id: "0134",
+                    title: "0134 - 以下关于文件的描述中，正确的是(    )。",
+                    options: { A: "使用open()打开文件时，必须要用r或w指定打开方式，不能省略", B: "采用readlines()可以读入文件的所有行，返回一个列表", C: "文件打开后，可以用write()控制对文件内容的读写位置", D: "如果没有采用close()关闭文件，Python程序退出时文件将不会自动关闭" },
+                    answer: "B",
+                    analysis: "使用open()函数打开文件时，省略打开方式会默认以只读方式打开；文件打开后，可以使用seek()方法对文件内容的读写位置进行控制。write()方法只是向文件写入一个字符串或字节流。如果没有采用close()方法关闭文件，有可能会导致数据丢失。Python程序退出时，文件一般会自动关闭。本题选择B选项。"
+                },
+                {
+                    id: "0135",
+                    title: "0135 - 以下不属于Python文件操作方法的是(    ) ",
+                    options: { A: "read()", B: "write()", C: "join()", D: "readline()" },
+                    answer: "C",
+                    analysis: "Python文件的读取方法有f.read()、f.readline()、f.readlines()、f.seek()，Python文件的写方法有f.write()、f.writelines()。本题选择C选项。"
+                },
+                {
+                    id: "0136",
+                    title: "0136 - 以下关于数据组织的描述中，错误的是(    )。",
+                    options: { A: "一维数据采用线性方式组织，可以用Python集合或列表表示", B: "列表仅用于表示一维和二维数据", C: "二维数据采用表格方式组织，可以用Python列表表示", D: "更高维数据由键值对类型的数据构成，可以用Python字典表示" },
+                    answer: "A",
+                    analysis: "一维数据采用线性方式组织，在Python中主要采用列表表示，集合不属于线性结构。二维据采用二维列表方式组织，在Python中可以采用二维列表表示。高维数据由键值对类型的数据构成，采用象方式组织，在Python中可以采用字典类型表示。本题选择A选项。"
+                },
+                {
+                    id: "0137",
+                    title: "0137 - 文件\"exam.txt\"与以下代码在同一目录下，其内容是一段文本：bigBen。以下代码的输出结果是(    )。<br>f=open(\"exam.txt\")<br>print(f)<br>f.close()",
+                    options: { A: "bigBen", B: "exam.txt", C: "<_io.TextIOWrapper...>", D: "exam" },
+                    answer: "C",
+                    analysis: "print(f) 输出的是 open() 函数返回的文件对象（<_io.TextIOWrapper...>）而非文件内容，若要输出文件里的 'bigBen'，需调用 f.read() 方法读取内容后再打印。"
+                },
+                {
+                    id: "0138",
+                    title: "0138 - 不属于Python开发用户界面的第三方库的是(    )。",
+                    options: { A: "PyGObject", B: "PyQt", C: "time", D: "PyGTK" },
+                    answer: "C",
+                    analysis: "PyQt(Qt开发库)、PyGObject及PyGTK(GTK+库)均是Python开发用户界面的第三方库。time库是Python提供的处理时间的标准库。本题选择C选项。"
+                },
+                {
+                    id: "0139",
+                    title: "0139 - 不属于Python数据分析及可视化处理的第三方库的是(    )。",
+                    options: { A: "seaborn", B: "random", C: "Mayavi2", D: "NumPy" },
+                    answer: "B",
+                    analysis: "属于Python数据分析及可视化的第三方库的有seaborn、NumPy、SciPy、pandas、Matplotlib、TVTK、Mayavi（也称Mayavi2）等。random库是Python用于产生各种分布的伪随机数序列的库。本题选择B选项。"
+                },
+                {
+                    id: "0140",
+                    title: "0140 - 属于Python中Web开发的第三方库的是(    )。",
+                    options: { A: "Pygame", B: "SciPy", C: "PDFMiner", D: "Pyramid" },
+                    answer: "D",
+                    analysis: "属于Web开发的Python第三方库有Django、Pyramid、Flask等。Pygame属于游戏开发方向的第三方库，SciPy属于数据分析方向的第三方库，PDFMiner属于文本处理方向的第三方库。本题选择D选项。"
+                }
+            ]
+        },
+        paper2: {
+            name: "第2套题",
+            questions: [
+                  {
+                      "id": "0201",
+                      "title": "0201 - 要使用外存储器中的信息，应先将其调入(    )",
+                      "options": { "A": "内存储器", "B": "控制器", "C": "运算器", "D": "微处理器" },
+                      "answer": "A",
+                      "analysis": "外存储器的容量一般都比较大，而且大部分可以移动，便于在不同计算机之间进行信息交流。外存储器中数据被读入内存储器后，才能被CPU读取，CPU不能直接访问外存储器。本题选择A 选项。"
+                },
+                {
+                    "id": "0202",
+                    "title": "0202 - 进程是(    )。",
+                    "options": { "A": "存放在内存中的程序", "B": "与程序等效的概念", "C": "一个系统软件", "D": "程序的执行过程" },
+                    "answer": "D",
+                    "analysis": "进程是指一个具有一定独立功能的程序关于某个数据集合的一次运行活动。简单地说，进程是可以并发执行的程序的执行过程，它是控制程序管理下的基本的多道程序单位。本题选择D选项。"
+                },
+                {
+                    "id": "0203",
+                    "title": "0203 - 下列叙述中正确的是(    ) 。",
+                    "options": { "A": "循环队列是队列的一种顺序存储结构", "B": "循环队列是队列的一种链式存储结构", "C": "循环队列中的队尾指针一定大于队头指针", "D": "循环队列中的队尾指针一定小于队头指针" },
+                    "answer": "A",
+                    "analysis": "循环队列是队列的一种顺序存储结构，用队尾指针rear指向队列中的队尾元素，用队头指针front指向队头元素的前一个位置。因此，从队头指针front指向的后一个位置直到队尾指针rear指向的位置之间的所有元素均为队列中的元素。在循环队列中，队头指针可以大于队尾指针，也可以小于队尾指针。本题选择A选项。"
+                },
+                {
+                    "id": "0204",
+                    "title": "0204 - 设栈与队列初始状态为空。将元素A,B,C,D,E,F,G,H依次轮流入栈和入队，然后依次轮流出栈和退队，则输出序列为(    )。",
+                    "options": { "A": "A,B,C,D,H,G,F,E", "B": "B,G,D,E,F,C,H,A", "C": "D,C,B,A,E,F,G,H", "D": "G,B,E,D,C,F,A,H" },
+                    "answer": "D",
+                    "analysis": "栈按先进后出的原则组织数据，所以入栈最早的元素最后出栈；队列按先进先出的原则组织数据，所以入队最早的元素最先退队。将元素A,B,C,D,E,F,G,H依次轮流入栈和入队，则入栈的顺序为A,C,E,G，入队的顺序为B,D,F,H。然后依次轮流出栈和退队，如G先出栈，接着B退队，以此类推，出栈的顺序为G,E,C,A，退队的顺序为B,D,F,H，故输出顺序为G,B,E,D,C,F,A,H。本题选择D选项。"
+                },
+                {
+                    "id": "0205",
+                    "title": "0205 - 设二叉树的前序序列为ABDEGHCFIJ，中序序列为DBGEHACIFJ，则按层次输出（从上到下，同一层从左到右）的序列为(    ) 。",
+                    "options": { "A": "ABCDEFGHIJ", "B": "DGHEBIJFCA", "C": "JIHGFEDCBA", "D": "GHIJDEFBCA" },
+                    "answer": "A",
+                    "analysis": "二叉树遍历可以分为3种：前序遍历（访问根节点在访问左子树和访问右子树之前）、中序遍历（访问根节点在访问左子树和访问右子树两者之间）、后序遍历（访问根节点在访问左子树和访问右子树之后），并且在遍历左右子树时也遵循同样的规则。本题中二叉树的前序序列为ABDEGHCFIJ，可确定根节点为A，按层次输出（从上到下，同一层从左到右）时访问的第一个节点也应该是A，所以可排除B、C和D三个选项。本题选择A选项。"
+                },
+                {
+                    "id": "0206",
+                    "title": "0206 - 结构化程序的3种基本控制结构是(    )。",
+                    "options": { "A": "递归、堆栈和队列", "B": "调用、返回和转移", "C": "顺序、选择和重复", "D": "过程、子程序和函数" },
+                    "answer": "C",
+                    "analysis": "结构化程序的基本控制结构有顺序结构、选择（分支）结构和重复（循环）结构。本题选择C 选项。"
+                },
+                {
+                    "id": "0207",
+                    "title": "0207 - 软件是(    ) 。",
+                    "options": { "A": "程序", "B": "计算机系统", "C": "程序和数据", "D": "程序、数据和文档的集合" },
+                    "answer": "D",
+                    "analysis": "计算机软件是由程序、数据及相关文档构成的完整集合，它与计算机硬件一起组成计算机系统。本题选择D选项。"
+                },
+                {
+                    "id": "0208",
+                    "title": "0208 - 在数据库中存储的是(    )。",
+                    "options": { "A": "数据模型", "B": "操作信息", "C": "数据的操作", "D": "数据以及数据之间的联系" },
+                    "answer": "D",
+                    "analysis": "数据库是存放数据的仓库，只不过数据库存放数据是按数据所提供的数据模式（数据之间的联系）存放的。本题选择D选项。"
+                },
+                {
+                    "id": "0209",
+                    "title": "0209 - 在关系数据库设计中，关系模式是用来记录用户数据的(    )。",
+                    "options": { "A": "二维表", "B": "视图", "C": "属性", "D": "实体" },
+                    "answer": "A",
+                    "analysis": "关系模式采用二维表来表示关系，简称表。本题选择A选项。"
+                },
+                {
+                    "id": "0210",
+                    "title": "0210 - 在关系模式A(S,SN,D）和B(D,CN,NM）中，关系A的主键是S，关系B的主键是D，则属性D在关系A 中称为(    )。",
+                    "options": { "A": "主键", "B": "外键", "C": "候选键", "D": "超键" },
+                    "answer": "B",
+                    "analysis": "属性D是关系B的主键，但在关系A中不是主键，因此属性D在关系A中是外键。本题选择B选项。"
+                },
+                {
+                    "id": "0211",
+                    "title": "0211 - 以下不属于Python保留字的是(    )。",
+                    "options": { "A": "class", "B": "pass", "C": "sub", "D": "def" },
+                    "answer": "C",
+                    "analysis": "关键字是编程语言内部定义并保留使用的标识符。Python 3.x有35个关键字，分别为and、as、assert、async、await、break、class、continue、def、del、elif、else、except、False、finally、for、from、global、if、import、in、is、lambda、None、nonlocal、not、or、pass、raise、return、True、try、while、with、yield。本题选择C选项。"
+                },
+                {
+                    "id": "0212",
+                    "title": "0212 - 表达式3**2*4//6%7的计算结果是(    )。",
+                    "options": { "A": "3", "B": "5", "C": "4", "D": "6" },
+                    "answer": "D",
+                    "analysis": "//是整除运算，%是求余运算。依次计算，3**2=9,9*4=36,36//6=6,6%7=6。本题选择D选项。"
+                },
+                {
+                    "id": "0213",
+                    "title": "0213 - 以下关于Python字符串的描述中，错误的是(    )。",
+                    "options": { "A": "在Python字符串中，可以混合使用正整数和负整数进行索引和切片", "B": "Python字符串采用[N:M]格式进行切片，获取字符串从索引N到M的子字符申（包含N和M）", "C": "字符串'my\\text.dat'中第一个\\表示转义符", "D": "空字符串可以表示为\"\"或''" },
+                    "answer": "B",
+                    "analysis": "Python字符串采用[N:M]格式进行切片，获取字符串从索引N到M的子字符串（包含N，不包含M）。本题选择B选项。"
+                },
+                {
+                    "id": "0214",
+                    "title": "0214 - Python提供3种基本的数字类型，它们是(    )。",
+                    "options": { "A": "整数类型、浮点数类型、复数类型", "B": "整数类型、二进制类型、浮点数类型", "C": "整数类型、二进制类型、浮点数类型", "D": "整数类型、二进制类型、复数类型" },
+                    "answer": "A",
+                    "analysis": "Python提供3种基本的数字类型：整数类型、浮点数类型、复数类型，分别对应数学中的整数、实数及复数。本题选择A选项。"
+                },
+                {
+                    "id": "0215",
+                    "title": "0215 - 以下关于语言类型的描述中，正确的是(     )。",
+                    "options": { "A": "静态语言采用解释方式执行，脚本语言采用编译方式执行", "B": "C语言是静态语言，Python是脚本语言", "C": "编译是将目标代码转换成源代码的过程", "D": "解释是将源代码一次性转换成目标代码同时逐条运行目标代码的过程" },
+                    "answer": "B",
+                    "analysis": "高级语言根据计算机中的执行机制的不同可分为两类：静态语言和脚本语言。静态语言采用编译方式执行，脚本语言采用解释方式执行。例如，C语言是静态语言，Python是脚本语言。编译是将源代码转换成目标代码的过程。解释是将源代码转换成目标代码同时运行目标代码的过程。本题选择B选项。"
+                },
+                {
+                    "id": "0216",
+                    "title": "0216 - 以下描述中，不属于Python控制结构的是(    )。",
+                    "options": { "A": "分支结构", "B": "程序异常", "C": "跳转结构", "D": "顺序结构" },
+                    "answer": "C",
+                    "analysis": "Python在3种基本控制逻辑[顺序结构、选择结构（也称分支结构）、循环结构]上进行了适当的扩展。在分支结构的基础上，Python增加了异常处理，使用try-except关键字。本题选择C选项。"
+                },
+                {
+                    "id": "0217",
+                    "title": "0217 - 以下关于分支结构的描述中，错误的是(    ) 。",
+                    "options": { "A": "if语句中语句块执行与否依赖于条件判断", "B": "if语句中条件部分可以使用任何能够产生True和False的语句和函数", "C": "二分支结构有一种紧凑形式，使用保留字if和elif实现", "D": "多分支结构用于设置多个判断条件及其对应的多条执行路径" },
+                    "answer": "C",
+                    "analysis": "Python的单分支结构使用if关键字对条件进行判断，语法格式如下。if ＜条件＞：＜语句块＞。Python的二分支结构使用if-else关键字对条件进行判断，语法格式如下。if ＜条件＞：＜语句块1＞ else:＜语句块2＞。Python的多分支结构使用if-elif-else关键字对多个相关条件进行判断，并根据不同条件的结果按照顺序选择执行路径，语法格式如下。if ＜条件1>：＜语句块1＞ elif ＜条件2>：＜语句块2＞ else:＜语句块3＞。本题选择C选项。"
+                },
+                {
+                    "id": "0218",
+
+                    "title": "0218 - 以下代码的输出结果是(    )。<br>while True:<br>&nbsp;&nbsp;&nbsp;&nbsp;guess=eval(input())<br>&nbsp;&nbsp;&nbsp;&nbsp;if guess==0x452//2:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break<br>print(guess)",
+                    "options": { "A": "0x452", "B": "break", "C": "553", "D": "\"0x452//2\"" },
+                    "answer": "C",
+                    "analysis": "该程序最外层是while循环，while 循环的条件是True，由此可知while内的语句会无限循环。input()函数的作用是获取用户用键盘输入的内容并以字符串类型返回。eval()函数的作用是把字符串转换成Python可用的语言。if语句的作用是控制程序是否继续循环，判断条件中的0x452是十六进制数，对2整除的结果是553，如果用户输入的数据是553，则将结果输出并终止循环；如果用户输入其他数据，程序会一直要求用户输入，直到输入正确的数据才会终止循环。本题选择C选项。"
+                },
+                {
+                    "id": "0219",
+
+                    "title": "0219 - 以下代码的输出结果是(    ) 。<br>for s in \"grandfather\":<br>&nbsp;&nbsp;&nbsp;&nbsp;if s==\"d\" or s==\"h\":<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>&nbsp;&nbsp;&nbsp;&nbsp;print(s,end=\"\")",
+                    "options": { "A": "grandfather", "B": "granfater", "C": "grand", "D": "father" },
+                    "answer": "B",
+                    "analysis": "for循环将字符串grandfather中的字符依次赋给变量s，当s==\"d\"或s==\"h\"时，结束本次循环，不执行print(s,end=\"\")；反之，则执行print(s,end=\"\")。故输出结果为granfater。本题选择B选项。"
+                },
+                {
+                    "id": "0220",
+                    "title": "0220 - 以下关于分支和循环结构的描述中，错误的是(    )。",
+                    "options": { "A": "while 循环只能用来实现无限循环", "B": "所有的for分支都可以用while 循环改写", "C": "保留字break可以终止一个循环", "D": "continue可以停止后续代码的执行，从循环的开头重新执行" },
+                    "answer": "A",
+                    "analysis": "Python中循环包括两种：遍历循环和无限循环。遍历循环使用关键字for依次提取遍历结构元素进行处理；无限循环使用关键字while 根据判断条件执行程序。如果while中判断条件可以执行一次或两次，while中的语句块也就执行一次或两次，故A选项错误。循环结构有两个辅助循环控制关键字：break 和continue。break用来跳出最内层for或while循环，脱离该循环后程序从循环后的代码继续执行；continue用来结束当前当次循环，即跳出循环体中尚未执行的语句，但跳不出当前循环。二者的区别是：continue 语句只结束本次循环，不终止整个循环的执行，而break语句具备结束循环的能力，故C、D选项正确。所有的for分支都可以用while循环改写，故B选项正确。本题选择A选项。"
+                },
+                {
+                    "id": "0221",
+                    "title": "0221 - 以下关于函数优点的描述中，正确的是(    )。",
+                    "options": { "A": "函数可以表现程序的复杂度", "B": "函数可以使程序更加模块化", "C": "函数可以减少代码多次使用", "D": "函数便于书写" },
+                    "answer": "B",
+                    "analysis": "函数是指将一组语句的集合通过一个名字（函数名）封装起来，要想执行这个函数，只需要调用其函数名即可。函数能提高应用的模块性和代码的重复利用率。本题选择B选项。"
+                },
+                {
+                    "id": "0222",
+                    "title": "0222 - Python中定义类的关键字是(    )。",
+                    "options": { "A": "def", "B": "class", "C": "function", "D": "defun" },
+                    "answer": "B",
+                    "analysis": "在Python中，用关键字 class来定义类。本题选择B选项。"
+                },
+                {
+                    "id": "0223",
+                    "title": "0223 - 以下关于Python函数的描述中，错误的是(    )。",
+                    "options": { "A": "可以定义函数接收可变数量的参数", "B": "定义函数时，某些参数可以赋予默认值", "C": "函数必须要有返回值", "D": "函数可以同时返回多个结果" },
+                    "answer": "C",
+                    "analysis": "在Python中，return语句用来结束函数并将程序返回函数被调用的位置继续执行。return 语句可以出现在函数中的任何部分，可以同时将0个、1个或多个函数运算结果返回给函数被调用处的变量。函数可以没有return语句，此时函数不返回值。本题选择C选项。"
+                },
+                {
+                    "id": "0224",
+                    "title": "0224 - 以下关于Python 函数的描述中，错误的是(    )。",
+                    "options": { "A": "Python程序的main()函数可以改为其他名称", "B": "如果Python程序包含一个函数main()，这个函数与其他函数地位相同", "C": "Python程序可以不包含main( )函数", "D": "Python 程序需要包含一个main ()函数且只能包含一个main()函数" },
+                    "answer": "D",
+                    "analysis": "Python是一种脚本解释语言，与C/C++和Java有很大的区别，其没有内置的main()函数。当运行单个Python文件时，如文件名为\"a.py\"，则a的属性__name__ == '__main__'，并不是先执行main()函数。Python程序自顶向下顺序执行。本题选择D选项。"
+                },
+                {
+                    "id": "0225",
+                    "title": "0225 - 以下代码的输出结果是(    )。<br>for s in \"PythonNCRE\":<br>&nbsp;&nbsp;&nbsp;&nbsp;if s==\"N\":<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break<br>&nbsp;&nbsp;&nbsp;&nbsp;print(s,end=\"\")",
+                    "options": { "A": "PythonCRE", "B": "N", "C": "Python", "D": "PythonNCRE" },
+                    "answer": "C",
+                    "analysis": "for循环将字符串 PythonNCRE的字符依次赋给变量s，当s==\"N\"时，跳出for循环，故输出为Python。本题选择C选项。"
+                },
+                {
+                    "id": "0226",
+                    "title": "0226 - 当用户输入2时，下面代码的输出结果是(    ) 。<br>try:<br>&nbsp;&nbsp;&nbsp;&nbsp;n=input(\"请输入一个整数：\")<br>&nbsp;&nbsp;&nbsp;&nbsp;def pow2(n):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return n**5<br>&nbsp;&nbsp;&nbsp;&nbsp;pow2(n)<br>except:<br>&nbsp;&nbsp;&nbsp;&nbsp;print(\"程序执行错误\")",
+                    "options": { "A": "32", "B": "2", "C": "程序没有任何输出", "D": "程序执行错误" },
+                    "answer": "D",
+                    "analysis": "input() 函数用来从控制台获得用户的一行输入。无论用户输入什么内容，input()函数都以字符串类型返回结果。当用户输入2时，n='2'，这是字符2，不是数字，不能进行数值运算，故程序会执行except后面的语句，输出“程序执行错误”。本题选择D选项。"
+                },
+                {
+                    "id": "0227",
+                    "title": "0227 - 在Python中，不属于组合数据类型的是(    )。",
+                    "options": { "A": "浮点数类型", "B": "字典类型", "C": "列表类型", "D": "字符串类型" },
+                    "answer": "A",
+                    "analysis": "常用的组合数据类型有3类，分别是集合类型、序列类型及映射类型。其中序列类型包括字符串类型、列表类型及元组类型。字典类型属于映射类型。本题选择A选项。"
+                },
+                {
+                    "id": "0228",
+                    "title": "0228 - 以下代码的输出结果是(    )。<br>lis=list(range(4))<br>print(lis)",
+                    "options": { "A": "[0,1,2,3,4]", "B": "[0,1,2,3]", "C": "0,1,2,3,", "D": "0,1,2,3,4," },
+                    "answer": "B",
+                    "analysis": "用方括号（[]）表示列表类型，也可以通过list()函数将集合或字符申类型转换成列表类型。题目代码生成列表lis=[0,1,2,3]，最后通过print()函数输出。本题选择B选项。"
+                },
+                {
+                    "id": "0229",
+                    "title": "0229 - 以下关于列表变量ls操作的描述中，错误的是(    )。",
+                    "options": { "A": "ls.copy ()：生成一个新列表，复制ls的所有元素", "B": "ls.remove(x)：删除ls中所有的x元素", "C": "ls.append(x)：在ls最后增加一个元素", "D": "ls.reverse ()：反转列表ls中所有元素" },
+                    "answer": "B",
+                    "analysis": "ls.remove(x）是删除列表ls中出现的第一个元素x，而不是删除列表ls中所有的x元素。本题选择B选项。"
+                },
+                {
+                    "id": "0230",
+                    "title": "0230 - 以下关于Python字典变量的定义中，正确的是(     )。",
+                    "options": { "A": "d={[1,2]:1,[3,4]:3}", "B": "d={1:as,2:sf}", "C": "d={(1,2):1,(3,4):3}", "D": "d={'python':1,[tea,cat]:2}" },
+                    "answer": "C",
+                    "analysis": "在Python中，字典使用花括号（{}）创建，是存储可变数量键值对的数据结构，每个元素是一个键值对，具有和集合类似的性质，即键值对之间没有顺序且不能重复。通过字典类型实现映射，键必须是唯一的，且必须是不可变数据类型；值可以是任何数据类型，故A、D选项错误。B选项中，值as和af没有引号，应被识别为变量，但as属于Python内部定义并保留使用的变量名，不能被创建为变量，故B选项错误。本题选择C选项。"
+                },
+                {
+                    "id": "0231",
+                    "title": "0231 - 列表listV=list(range(10))，以下能够输出列表listV中最小元素的是(    )。",
+                    "options": { "A": "print(min(listV))", "B": "print(listV.max())", "C": "print(min(listV( )))", "D": "print(listV.reverse(i)[0])" },
+                    "answer": "A",
+                    "analysis": "在Python中，假设列表名为ls，列表操作函数有如下几种。len(ls)：返回列表ls的元素个数（长度）。min(ls)：返回列表ls的最小元素。max(ls)：返回列表ls的最大元素。list(x)：将x转变为列表类型。使用min(ls）和max(ls）的前提是列表中各元素类型可以进行比较。如果列表元素不能比较，使用这个函数将会报错。本题选择A选项。"
+                },
+                {
+                    "id": "0232",
+
+                    "title": "0232 - 以下代码的输出结果是(    )。<br>ls=[]<br>for m in '想念'：<br>&nbsp;&nbsp;&nbsp;&nbsp;for n in '家人'：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ls.append(m+n)<br>print(ls)",
+                    "options": { "A": "想念家人", "B": "想想念念家家人人", "C": "想家想人念家念人", "D": ["想家","想人","念家","念人"] },
+                    "answer": "D",
+                    "analysis": "外层for第1次循环将字符“想”赋给变量m，内层for第1次循环将“家”赋给变量n，再利用列表的append ()方法将m+n连接后的字符“想家”加入列表ls；内层for第2次循环将“人”赋给变量n，再利用列表的append ()方法将m+n连接后的字符“想人”加入列表ls。外层for第2次循环将字符“念”赋给变量m，内层for第1次循环将字符“家”赋给变量n，再利用列表的append()方法将m+n连接后的字符“念家”加入列表ls；内层for第2次循环将字符“人”赋给变量n，再利用列表的append()方法将m+n连接后的字符“念人”加入列表ls。最后列表ls=['想家','想人','念家','念人']，执行print(ls）语句输出ls。本题选择D选项。"
+                },
+                {
+                    "id": "0233",
+                    "title": "0233 - Python 读取文件中一行内容的操作是(    ) 。",
+                    "options": { "A": "readtext", "B": "readline", "C": "readall", "D": "read" },
+                    "answer": "B",
+                    "analysis": "在Python中，假设f代表文件变量，文件的读取方法有如下几种。f.read ()：从文件中读入整个文件的内容。f.readline ()：从文件中读入一行内容。f.readlines()：从文件中读入所有行，以每行为元素形成一个列表。f.seek()：改变当前文件操作指针的位置。本题选择B选项。"
+                },
+                {
+                    "id": "0234",
+                    "title": "0234 - 文件\"family.txt\"在当前代码所在目录内，其内容是一段文本：We are family。以下代码的输出结果是(    )。<br>txt=open('family.txt','r')<br>print(txt)<br>txt.close()",
+                    "options": { "A": "txt", "B": "family.txt", "C": "其他答案", "D": "We are family" },
+                    "answer": "C",
+                    "analysis": "open()函数用来打开一个文件，并返回可以操作这个文件的变量。open()函数有两个参数：文件名和打开模式。本题只是打开了文件，并没有对文件进行操作，因此不会输出文件的内容。print语句输出的是变量txt代表的文件的相关信息：<_io.TextIOWrapper name='family.txt' mode='r' encoding='cp936'>。若想要输出文件的内容，需要把文件的内容读入，如txt1=txt.read()。本题选择C选项。"
+                },
+                {
+                    "id": "0235",
+                    "title": "0235 - 假设文件\"city.csv\"的内容如下：哈密瓜，香瓜，无籽西瓜，水晶葡萄；奶油富士，火龙果，百香果。以下代码的输出结果是(    ) 。<br>f=open('city.csv','r')<br>ls=f.read().split(',')<br>f.close()<br>print(ls)",
+                    "options": { "A": ["哈密瓜","香瓜","无籽西瓜","水晶葡萄\n奶油富士","火龙果","百香果"], "B": ["哈密瓜","香瓜","无籽西瓜","水晶葡萄","奶油富士","火龙果","百香果"], "C": ["哈密瓜，香瓜，无籽西瓜，水晶葡萄，奶油富士，火龙果，百香果"], "D": ["哈密瓜","香瓜","无籽西瓜","水晶葡萄","\n","奶油富士","火龙果","百香果"] },
+                    "answer": "A",
+                    "analysis": "在Python中，split()方法通过指定分隔符对字符串进行切片，返回分隔后的字符串列表。split(\",\"）方法从CSV文件中获取内容时，无法去除换行符。水晶葡萄\\n奶油富士作为一个列表元素出现，ls=['哈密瓜','香瓜','无籽西瓜','水晶葡萄\\n奶油富士','火龙果','百香果']，最后输出列表。本题选择A选项。"
+                },
+                {
+                    "id": "0236",
+                    "title": "0236 - 以下代码的输出结果是(     )。<br>fo=open('book.txt','w')<br>ls=['C语言','Java','C#','Python']<br>fo.writelines(ls)<br>fo.close()",
+                    "options": { "A": "'C语言\"Java\"C#\"Python'", "B": "C语言JavaC#Python", "C": "[C语言，Java,C#,Python]", "D": ["C语言", "Java", "C#", "Python"] },
+                    "answer": "B",
+                    "analysis": "文件打开模式中w表示覆盖写模式。若文件不存在，则创建新文件；若文件存在，则完全覆盖原文件。文件写人方法中，writelines ()表示直接将列表类型的各元素连接起来写人文件中。题目代码是将列表ls中的内容全部写人文件中。本题选择B选项。"
+                },
+                {
+                    "id": "0237",
+                    "title": "0237 - 在读／写文件之前，需要打开文件，使用的函数是(    ) 。",
+                    "options": { "A": "read", "B": "fopen", "C": "open", "D": "CFile" },
+                    "answer": "C",
+                    "analysis": "open()函数用来打开一个文件，并返回一个操作这个文件的变量，其语法格式为＜文件变量名＞=open(＜文件路径及文件名＞,＜打开模式＞）。本题选择C选项。"
+                },
+                {
+                    "id": "0238",
+                    "title": "0238 - 在Python中，包含矩阵运算的第三方库是(    ) 。",
+                    "options": { "A": "NumPy", "B": "PyQ15", "C": "wordcloud", "D": "wxPython" },
+                    "answer": "A",
+                    "analysis": "NumPy是一种开源数值计算扩展的第三方库，用于处理数据类型相同的多维数组。NumPy可以用来存储和处理大型矩阵，提供了许多高级的数组编程工具，如矩阵运算、矢量处理、傅里叶变换等。本题选择A选项。"
+                },
+                {
+                    "id": "0239",
+                    "title": "0239 - 在Python中，能够处理图像的第三方库是(    ) 。",
+                    "options": { "A": "PyInstaller", "B": "pyserial", "C": "pygame", "D": "PIL" },
+                    "answer": "D",
+                    "analysis": "PIL库是Python在图像处理方面的第三方库，支持图像存储、处理及显示。它能处理几乎所有的图片格式，可以完成对图像的缩放、剪裁、叠加以及为图像添加线条、图像及文字等操作。Python处理与图像相关的程序，首选PIL库。本题选择D选项。"
+                },
+                {
+                    "id": "0240",
+                    "title": "02 40 - 在Python中，属于Web开发的第三方库是(    )。",
+                    "options": { "A": "Mayavi", "B": "Flask", "C": "PyQ15", "D": "time" },
+                    "answer": "B",
+                    "analysis": "在Python中，属于Web开发的第三方库有Django库、Pyramid库及Flask库。本题选择B选项。"
+                }
+            ]
+        },
+        paper3: {
+            name: "第3套题",
+            questions: [
+                {
+                    "id": "0301",
+                    "title": "0301 - 在计算机中，运算器的基本功能是(    )。",
+                    "options": {"A": "进行算术和逻辑运算", "B": "存储各种控制信息", "C": "保持各种控制状态", "D": "控制机器各个部件协调一致地工作"},
+                    "answer": "A",
+                    "analysis": "CPU主要包括运算器和控制器两部分。运算器负责对数据进行加工处理，也就是对数据进行算术运算和逻辑运算；控制器负责对程序所规定的指令进行分析，控制并协调输入、输出操作或对内存的访问。本题选择A选项。"
+                },
+                {
+                    "id": "0302",
+                    "title": "0302 - 理论上计算机虚拟内存最大容量取决于(    )。",
+                    "options": {"A": "磁盘空间的大小", "B": "物理内存的大小", "C": "计算机地址位数", "D": "数据存放的实际地址"},
+                    "answer": "C",
+                    "analysis": "虚拟内存的作用同物理内存一样，只不过是从硬盘存储空间划出的部分，以完成内存的工作，由于不是真正的内存，所以被称为虚拟内存。计算机所支持的最大内存是由该计算机的地址位数决定的，也就是计算机的最大寻址能力。例如，32位计算机的寻址能力为2^32个地址，大约为4GB。所以虚拟内存的大小受计算机地址位数的限制。本题选择C选项。"
+                },
+                {
+                    "id": "0303",
+                    "title": "0303 - 下列叙述中错误的是(    ) 。",
+                    "options": {"A": "循环链表中有一个表头节点", "B": "循环链表的存储空间是连续的", "C": "循环链表的表头指针与循环链表中最后一个节点的指针均指向表头节点", "D": "循环链表实现了空表与非空表运算的统一"},
+                    "answer": "B",
+                    "analysis": "线性表链式存储结构的特点是，用一组不连续的存储单元存储线性表中的各个元素。线性链表的存储单元是任意的，即各数据节点的存储序号可以是连续的，也可以是不连续的。循环链表采用链式存储结构，因此存储空间也可以是不连续的。本题选择B选项。"
+                },
+                {
+                    "id": "0304",
+                    "title": "0304 - 设栈的存储空间为S(1:50)，初始状态为top=51。现经过一系列正常的入栈与退栈操作后，top=5，则栈中的元素个数为(    ) 。",
+                    "options": {"A": "0", "B": "1", "C": "50", "D": "49"},
+                    "answer": "B",
+                    "analysis": "栈的存储空间为S(1:50)，初始状态为top=51，即栈的初始状态为空。每进栈一个元素，top-1；每出栈一个元素，top+1。当top=50时，栈中只有一个元素。本题选择B选项。"
+                },
+                {
+                    "id": "0305",
+                    "title": "0305 - 某二叉树共有399个节点，其中有199个度为2的节点，则该二叉树中的叶子节点数为(    )。",
+                    "options": {"A": "不存在这样的二叉树", "B": "198", "C": "199", "D": "200"},
+                    "answer": "D",
+                    "analysis": "根据二叉树的性质：对任何一棵二叉树，度为0的节点（即叶子节点）总是比度为2的节点多一个。本题中，度为2的节点个数为199，则叶子节点数为199+1=200。199+200=399，即这棵二叉树中只存在度为0和度为2的节点，不存在度为1的节点。本题选择D选项。"
+                },
+                {
+                    "id": "0306",
+                    "title": "0306 - 下面对“对象”概念描述错误的是(    )。",
+                    "options": {"A": "对象不具有封装性", "B": "对象是属性和方法的封装体", "C": "对象间的通信是靠消息传递", "D": "一个对象是其对应类的实例"},
+                    "answer": "A",
+                    "analysis": "对象是由描述该对象属性的数据以及可以对这些数据施加的所有操作封装在一起构成的统一体，A选项错误，B选项正确。消息传递是对象间通信的手段，一个对象通过向另一个对象发送消息来请求其服务，C选项正确。类是对象的抽象，一个对象则是其对应类的一个实例，D选项正确。本题选择A选项。"
+                },
+                {
+                    "id": "0307",
+                    "title": "0307 - 软件应首先满足用户的(    ) 。",
+                    "options": {"A": "性能需求", "B": "功能需求", "C": "可扩展性", "D": "纠错能力"},
+                    "answer": "B",
+                    "analysis": "软件产品必须提供用户所需的功能，如果做不到这一点，什么产品都没有意义。本题选择B选项。"
+                },
+                {
+                    "id": "0308",
+                    "title": "0308 - 数据库管理系统的基本功能不包括(    ) 。",
+                    "options": {"A": "数据库定义", "B": "数据库的建立和维护", "C": "数据库访问", "D": "数据库和网络中其他系统的通信"},
+                    "answer": "D",
+                    "analysis": "数据库管理系统的主要功能包括：①数据模式定义；②数据存取的物理构建；③数据操纵；④数据完整性、安全性的定义与检查；⑤数据库的并发控制与故障恢复；⑥数据服务。本题选择D选项。"
+                },
+                {
+                    "id": "0309",
+                    "title": "0309 - 关系数据库规范化的目的是解决关系数据库中的(    )。",
+                    "options": {"A": "数据操作复杂的问题", "B": "查询速度低的问题", "C": "插入、删除异常及数据冗余问题", "D": "数据安全性和完整性保障的问题"},
+                    "answer": "C",
+                    "analysis": "关系模式进行规范化的目的是使关系结构更加合理，消除存储异常，使数据冗余尽量小，便于插入、删除和更新等操作。本题选择C选项。"
+                },
+                {
+                    "id": "0310",
+                    "title": "0310 - 由关系R1和R2得到关系R3的操作是(    ) 。",
+                    "image": {
+                        "url": "https://youke.xn--y7xa690gmna.cn/s1/2026/01/27/6978c0ae324b6.webp",
+                        "alt": "关系图"
+                    },
+                    "options": {"A": "等值连接", "B": "并", "C": "笛卡儿积", "D": "交"},
+                    "answer": "A",
+                    "analysis": "关系R1和关系R2均为3元的关系，而关系R3为6元的关系，两个3元的关系进行并或交操作不可能得到6元的关系，可直接排除B、D两项。关系R1和关系R2均有3个元组，两者进行笛卡儿积操作应得到一个含有9个元组的关系，而题目中R3只有3个元组，排除C项。关系R3是关系R1和关系R2按照条件R1.B=R2.D进行等值连接得到的关系。本题选择A选项。"
+                },
+                {
+                    "id": "0311",
+                    "title": "0311 - 在Python中，可以作为源文件扩展名的是(    ) 。",
+                    "options": {"A": ".png", "B": ".pdf", "C": ".py", "D": ".ppt"},
+                    "answer": "C",
+                    "analysis": "在Python中，源文件的扩展名一般使用.py。本题选择C选项。"
+                },
+                {
+                    "id": "0312",
+                    "title": "0312 - 以下不属于Python保留字的是(    ) 。",
+                    "options": {"A": "goto", "B": "False", "C": "True", "D": "pass"},
+                    "answer": "A",
+                    "analysis": "关键字是编程语言内部定义并保留使用的标识符。Python 3.x有35个关键字，分别为and、as、assert、async、await、break、class、continue、def、del、elif、else、except、False、finally、for、from、global、if、import、in、is、lambda、None、nonlocal、not、or、pass、raise、return、True、try、while、with、yield。本题选择A选项。"
+                },
+                {
+                    "id": "0313",
+                    "title": "0313 - 以下代码的输出结果是(    ) 。\nprint(0.1+0.2==0.3)",
+                    "options": {"A": "-1", "B": "True", "C": "False", "D": "0"},
+                    "answer": "C",
+                    "analysis": "在Python中,0.1+0.2=0.30000000000000004。原因：对于十进制，它只能表示以进制数的质因子为分母的分数。10的质因子有2和5，因此1/2、1/4、1/5、1/8及1/10都可以精确表示；相反，1/3、1/6及1/7都是循环小数，因为它们的分母使用了质因子3或者7。二进制中，只有一个质因子，即2，因此只能精确表示分母质因子是2的分数。二进制中，1/2、1/4及1/8都可以被精确表示，但1/5或者1/10就变成了循环小数。所以，在十进制中能够精确表示的0.1与0.2(1/10与1/5)，到了计算机所使用的二进制中就变成了循环小数。当对这些循环小数进行数学运算并将二进制数据转换成人类易读的十进制数据时，会对小数尾部进行截断处理。在不同的编程语言中，运行0.1+0.2会输出不同的结果。本题选择C选项。"
+                },
+                {
+                    "id": "0314",
+                    "title": "0314 - 以下关于Python字符编码的描述中，正确的是(    )。",
+                    "options": {"A": "Python字符编码使用ASCII值存储", "B": "chr(x）和ord(x）函数用于在单字符和Unicode值之间进行转换", "C": "print(chr('a')）输出97", "D": "print(ord(65)）输出A"},
+                    "answer": "B",
+                    "analysis": "在Python中，字符编码以Unicode值存储。chr(x）和ord(x）函数用于在单字符和Unicode 值之间进行转换。chr(x）函数返回Unicode 值对应的字符，ord(x）函数返回单字符x对应的Unicode值，如chr（97）返回'a',ord('和')返回21644。因此，选项C、D错误。本题选择B选项。"
+                },
+                {
+                    "id": "0315",
+                    "title": "0315 - 以下代码的输出结果是(    ) 。\na=10.99\nprint(complex(a))",
+                    "options": {"A": "0.99", "B": "10.99i+j", "C": "10.99", "D": "(10.99+0j)"},
+                    "answer": "D",
+                    "analysis": "a=10.99，说明实部为10.99，虚部为0，故complex(a）返回复数10.99+0j。本题选择D选项。"
+                },
+                {
+                    "id": "0316",
+                    "title": "0316 - 以下保留字不属于分支或循环逻辑的是(    )。",
+                    "options": {"A": "elif", "B": "do", "C": "for", "D": "while"},
+                    "answer": "B",
+                    "analysis": "elif是分支逻辑关键字，for和while是循环逻辑关键字，在Python中没有do关键字。本题选择B选项。"
+                },
+                {
+                    "id": "0317",
+                    "title": "0317 - 在Python中，使用for-in方式形成的循环不能遍历的类型是(    )。",
+                    "options": {"A": "列表", "B": "复数", "C": "字符串", "D": "字典"},
+                    "answer": "B",
+                    "analysis": "在Python中，使用for-in方式形成的循环能遍历的类型有字符串、文件、range()函数或组合数据类型，不能遍历复数。本题选择B选项。"
+                },
+                {
+                    "id": "0318",
+                    "title": "0318 - 以下关于Python的try语句的描述中，错误的是(    ) 。",
+                    "options": {"A": "try用来捕捉执行代码发生的异常，处理异常后能够回到异常处继续执行", "B": "执行try代码块触发异常后，会执行except后面的语句", "C": "一个try代码块可以对应多个处理异常的except代码块", "D": "try代码块不触发异常时，不会执行except后面的语句"},
+                    "answer": "A",
+                    "analysis": "Python使用关键字try和except进行异常处理，执行try代码块发生异常时，会执行except关键字后面的语句块，处理完成后不会回到异常处继续执行。一个try代码块可以对应多个处理异常的except代码块。本题选择A选项。"
+                },
+                {
+                    "id": "0319",
+                    "title": "0319 - Python 中用来表示代码块所属关系的语法是(    ) 。",
+                    "options": {"A": "花括号", "B": "圆括号", "C": "缩进", "D": "冒号"},
+                    "answer": "C",
+                    "analysis": "在Python中，缩进是指每行语句开始前的空白区域，用来表示Python程序间的包含和层次关系。本题选择C选项。"
+                },
+                {
+                    "id": "0320",
+                    "title": "0320 - 以下描述错误的是(    )。",
+                    "options": {"A": "Python是一门动态的解释型语言", "B": "当Python脚本程序发生了异常，如果不处理，运行结果不可预测", "C": "编程语言中的异常和错误是完全相同的概念", "D": "Python通过try、except等保留字提供异常处理功能"},
+                    "answer": "C",
+                    "analysis": "异常是指在程序运行过程中发生的异常事件，通常是由外部问题（如硬件错误、输入错误）所导致。错误是指导致系统不能按照用户意图工作的一切原因、事件。在程序设计过程中，由于某些错误的存在，导致程序无法正常运行。处理这些错误确保程序正确运行的过程被称为错误处理。异常和错误是完全不同的概念。本题选择C选项。"
+                },
+                {
+                    "id": "0321",
+                    "title": "0321 - 以下关于Python函数的描述中，错误的是(    )。",
+                    "options": {"A": "函数代码是可以重复使用的", "B": "每次使用函数需要提供相同的参数作为输入", "C": "函数通过函数名进行调用", "D": "函数是一段具有特定功能的语句组"},
+                    "answer": "B",
+                    "analysis": "函数是一段具有特定功能的、可重用的语句组，它通过函数名来标识和调用。采用参数名称传递方式不需要保持参数传递的顺序，参数之间的顺序可以任意调整，只需要对每个必要参数赋予实际值即可。每次使用函数不需要提供相同的参数作为输入。本题选择B选项。"
+                },
+                {
+                    "id": "0322",
+                    "title": "0322 - 函数中定义了3个参数，其中2个参数都指定了默认值，调用函数时参数个数最少是(     )。",
+                    "options": {"A": "0", "B": "2", "C": "1", "D": "3"},
+                    "answer": "C",
+                    "analysis": "函数定义的语法格式如下：\ndef ＜函数名＞(＜非可选参数列表＞,＜可选参数＞=＜默认值＞)：\n    ＜函数体＞\n    return ＜返回值列表＞\n可选参数一般放置在非可选参数的后面。题目中函数中定义了3个参数，其中2个参数都指定了默认值，那么调用函数时，参数个数最少是1个（仅传递非可选参数）。本题选择C选项。"
+                },
+                {
+                    "id": "0323",
+                    "title": "0323 - 以下关于Python函数的描述中，正确的是(    ) 。",
+                    "options": {"A": "函数eval()可以用于数值表达式的求值，如eval('2*3+1')", "B": "Python中，def和return是函数必须使用的保留字", "C": "Python 函数定义中没有对参数指定类型，这说明参数在函数中可以当作任意类型使用", "D": "一个函数中只允许有一条return 语句"},
+                    "answer": "A",
+                    "analysis": "在Python中，return语句可以没有，函数可以没有返回值，故B错误；Python函数参数无类型声明，但不代表可以当作任意类型使用（如传入不支持的类型会报错），故C错误；一个函数可以有多个return语句，故D错误。eval()函数将去掉字符串最外侧的引号，并按照Python语句方式执行去掉引号后的字符内容，可用于数值表达式求值。本题选择A选项。"
+                },
+                {
+                    "id": "0324",
+                    "title": "0324 - 关于以下代码的描述中，正确的是(    ) 。<br>def func(a,b):<br>&nbsp;&nbsp;&nbsp;&nbsp;c=a**2+b<br>&nbsp;&nbsp;&nbsp;&nbsp;b=a<br>&nbsp;&nbsp;&nbsp;&nbsp;return c<br>a=10<br>b=2<br>c=func(b,a)+a",
+                    "options": {"A": "执行该函数后，变量c的值为112", "B": "该函数名称为fun", "C": "执行该函数后，变量b的值为2", "D": "执行该函数后，变量b的值为10"},
+                    "answer": "C",
+                    "analysis": "程序中，将实参b的值(2)传给形参a，将实参a的值(10)传给形参b，则在函数体中c=2**2+10=14，函数返回14，实参c=14+10=24；形参a和b在函数结束后会自动释放，并没有影响实参a和b的值，故实参a仍然是10，实参b仍然是2。本题选择C选项。"
+                },
+                {
+                    "id": "0325",
+                    "title": "0325 - 以下关于Python全局变量和局部变量的描述中，错误的是(    )。",
+                    "options": {"A": "局部变量在使用过后立即被释放", "B": "全局变量一般没有缩进", "C": "全局变量和局部变量的命名不能相同", "D": "一个程序中的变量包含两类：全局变量和局部变量"},
+                    "answer": "C",
+                    "analysis": "根据程序中变量所在的位置和作用范围，变量分为局部变量和全局变量。局部变量是指在函数内部定义的变量，仅在函数内部有效，函数退出后变量释放；全局变量一般在函数外定义，无缩进。全局变量和局部变量的命名可以相同（此时局部变量会遮蔽全局变量）。本题选择C选项。"
+                },
+                {
+                    "id": "0326",
+                    "title": "0326 - 以下的函数定义中，错误的是(    )。",
+                    "options": {"A": "def vfunc(s,a=1,*b):", "B": "def vfunc(a=3,b):", "C": "def vfunc(a,**b):", "D": "def vfunc(a,b=2):"},
+                    "answer": "B",
+                    "analysis": "函数定义时，可选参数（带默认值）必须放在非可选参数之后。选项B中a=3是可选参数，b是非可选参数，顺序错误，因此定义错误。本题选择B选项。"
+                },
+                {
+                    "id": "0327",
+                    "title": "0327 - 以下关于Python列表的描述中，正确的是(    )。",
+                    "options": {"A": "列表的长度和内容都可以改变，但元素类型必须相同", "B": "不可以对列表进行成员运算操作、长度计算及分片", "C": "列表的索引是从1开始的", "D": "可以使用比较操作符（如＞、＜等）对列表进行比较"},
+                    "answer": "D",
+                    "analysis": "列表元素类型可以不同，A错误；列表支持成员运算(in/not in)、len()计算长度、分片（切片）操作，B错误；列表索引从0开始，C错误；列表可以使用比较操作符比较（按元素依次比较），D正确。本题选择D选项。"
+                },
+                {
+                    "id": "0328",
+                    "title": "0328 - 以下关于Python字典的描述中，错误的是(    )。",
+                    "options": {"A": "在Python中，用字典来实现映射，通过整数索引来查找其中的元素", "B": "在定义字典对象时，键和值用冒号连接", "C": "字典中的键值对之间没有顺序且不能重复", "D": "字典中引用与特定键对应的值，用字典名称和方括号中包含键名的格式"},
+                    "answer": "A",
+                    "analysis": "字典通过键来查找值，而不是整数索引，A错误；字典定义时键值对用冒号连接，B正确；字典键值对无序且键不能重复，C正确；字典取值格式为dict[key]，D正确。本题选择A选项。"
+                },
+                {
+                    "id": "0329",
+                    "title": "0329 - 以下用来处理Python字典的方法中，正确的是(    )。",
+                    "options": {"A": "interleave", "B": "get", "C": "insert", "D": "replace"},
+                    "answer": "B",
+                    "analysis": "字典的常用方法包括get()（根据键取值，键不存在返回默认值），interleave、insert、replace都不是字典的方法（insert是列表方法）。本题选择B选项。"
+                },
+                {
+                    "id": "0330",
+                    "title": "0330 - 以下代码的输出结果是(    ) 。\nls =['book',666,[2018,'python',314],20]\nprint(ls[2][1][-2])",
+                    "options": {"A": "n", "B": "python", "C": "o", "D": "结果错误"},
+                    "answer": "C",
+                    "analysis": "列表索引从0开始，ls[2]是[2018,'python',314]，ls[2][1]是'python'，ls[2][1][-2]是倒数第二个字符'o'。本题选择C选项。"
+                },
+                {
+                    "id": "0331",
+                    "title": "0331 - 以下代码的输出结果是(    )。\nd={'food':{'cake':1,'egg':5}}\nprint(d.get('egg','no this food'))",
+                    "options": {"A": "egg", "B": "1", "C": "food", "D": "no this food"},
+                    "answer": "D",
+                    "analysis": "d.get('egg','no this food')查找的是字典d的第一层键，d的第一层只有键'food'，没有键'egg'，因此返回默认值'no this food'。本题选择D选项。"
+                },
+                {
+                    "id": "0332",
+                    "title": "0332 - 以下代码的输出结果是(    )。<br><pre><code>a=[[1,2,3],[4,5,6],[7,8,9]]<br>s=0<br>for c in a:<br>&nbsp;&nbsp;&nbsp;&nbsp;for j in range(3):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s+=c[j]<br>print(s)</code></pre>",
+                    "options": {"A": "[1,2,3,4,5,6,7,8,9]", "B": "45", "C": "24", "D": "0"},
+                    "answer": "B",
+                    "analysis": "外层循环遍历a的每个子列表，内层循环遍历子列表的每个元素并累加，最终计算1+2+3+4+5+6+7+8+9=45。本题选择B选项。"
+                },
+                {
+                    "id": "0333",
+                    "title": "0333 - 以下关于Python文件打开模式的描述中，错误的是(    )。",
+                    "options": {"A": "只读模式是r", "B": "覆盖写模式是w", "C": "追加写模式是a", "D": "创建写模式是n"},
+                    "answer": "D",
+                    "analysis": "文件打开模式：r（只读）、w（覆盖写）、a（追加写）、x（创建写），没有n模式。本题选择D选项。"
+                },
+                {
+                    "id": "0334",
+                    "title": "0334 - 以下关于CSV文件的描述中，正确的是(    )。",
+                    "options": {"A": "CSV文件只能采用Unicode 编码表示字符", "B": "CSV文件的每一行是一维数据，可以使用Python的元组类型表示", "C": "CSV文件是一种通用的文件，主要用于不同程序之间的数据交换", "D": "CSV文件是一个一维数据"},
+                    "answer": "C",
+                    "analysis": "CSV文件编码无强制要求（ASCII是基础），A错误；CSV每行一维数据，常用列表表示，B错误；CSV是通用文件，用于程序间数据交换，C正确；CSV可存储一维或二维数据，D错误。本题选择C选项。"
+                },
+                {
+                    "id": "0335",
+                    "title": "0335 - 给定列表ls=[1,2,3,11111,11211,11311]，其元素包含两种数据类型，列表ls的数据组织维度是(    )。",
+                    "options": {"A": "二维数据", "B": "一维数据", "C": "多维数据", "D": "高维数据"},
+                    "answer": "B",
+                    "analysis": "二维数据由多个一维数据构成（如列表的列表），本题中ls是单层列表，即使元素类型不同，仍然是一维数据。本题选择B选项。"
+                },
+                {
+                    "id": "0336",
+                    "title": "0336 - 在Python中，使用open( )打开Windows操作系统D盘下的一个文件，路径名错误的是(    ) 。",
+                    "options": {"A": "D:\\PythonTest \\a.txt", "B": "D:\\\\PythonTest\\\\a.txt", "C": "D:/PythonTest/a.txt", "D": "D://PythonTest//a.txt"},
+                    "answer": "A",
+                    "analysis": "在Python字符串中，\\是转义字符，因此表示路径时需要用\\\\、/或//代替\\。选项A中D:\\PythonTest \\a.txt的\\会被解析为转义字符，导致路径错误。本题选择A选项。"
+                },
+                {
+                    "id": "0337",
+                    "title": "0337 - 在Python中，将二维数据写入CSV文件，最可能使用的函数是(    )。",
+                    "options": {"A": "write()", "B": "split()", "C": "join()", "D": "exists()"},
+                    "answer": "C",
+                    "analysis": "将二维列表写入CSV时，通常先通过join()将每行的元素用逗号连接成字符串，再用write()写入文件；split()用于分割字符串，exists()用于判断文件是否存在。本题选择C选项。"
+                },
+                {
+                    "id": "0338",
+                    "title": "0338 - 以下不属于Python数据分析领域第三方库的是(    ) 。",
+                    "options": {"A": "Scrapy", "B": "NumPy", "C": "pandas", "D": "Matplotlib"},
+                    "answer": "A",
+                    "analysis": "NumPy（数值计算）、pandas（数据处理）、Matplotlib（数据可视化）都是数据分析领域库；Scrapy是网络爬虫库。本题选择A选项。"
+                },
+                {
+                    "id": "0339",
+                    "title": "0339 - 在Python中，用来安装第三方库的工具是(    )。",
+                    "options": {"A": "install", "B": "pip", "C": "PyQt5", "D": "PyInstaller"},
+                    "answer": "B",
+                    "analysis": "pip是Python的包管理工具，用于安装和管理第三方库；install是pip的子命令（如pip install）；PyQt5是GUI库；PyInstaller用于打包Python程序。本题选择B选项。"
+                },
+                {
+                    "id": "0340",
+                    "title": "0340 - 以下属于Python 机器学习领域第三方库的是(   ) 。",
+                    "options": {"A": "turtle", "B": "NumPy", "C": "pygame", "D": "MXNet"},
+                    "answer": "D",
+                    "analysis": "turtle是绘图标准库，NumPy是数据分析库，pygame是游戏开发库，MXNet是机器学习框架。本题选择D选项。"
+                }
+            ]
+        },
+        paper4: {
+            name: "第4套题",
+            questions:[
+                 {
+                "id": "0401",
+                "title": "0401 - 整数在计算机中存储和运算通常采用的格式是(    ) 。",
+                "options": {"A": "原码", "B": "补码", "C": "反码", "D": "偏移码"},
+                "answer": "B",
+                "analysis": "根据符号位和数值位的编码方法不同，机器数有原码、补码和反码3种表示。整数在计算机中存储和运算通常采用的格式是补码。本题选择B选项。"
+                },
+                {
+                "id": "0402",
+                "title": "0402 - 在操作系统中，将文件名转换为文件存储地址的结构是(    )。",
+                "options": {"A": "路径名", "B": "PCB表", "C": "文件目录", "D": "文件名"},
+                "answer": "C",
+                "analysis": "一个计算机系统中有成千上万个文件，为了便于对文件进行存取和管理，计算机系统建立了文件的索引，即文件名和文件物理位置之间的映射关系，这种文件的索引称为文件目录。本题选择C选项。"
+                },
+                {
+                    "id": "0403",
+                    "title": "0403 - 在长度为n的有序链表中进行查找，最坏情况下需要比较的次数为(    ) 。",
+                    "options": {"A": "n-1", "B": "n/2", "C": "n", "D": "与有序顺序表的二分法查找相同"},
+                    "answer": "C",
+                    "analysis": "最坏情况为：查找的元素为表中最后一个元素或查找的元素不在表中，则需要比较表中所有元素，所以最坏情况下需要比较次数为n。本题选择C选项。"
+                },
+                {
+                    "id": "0404",
+                    "title": "0404 - 循环队列的存储空间为Q(1:50）。经过一系列正常的入队与退队操作后，front=rear=25。然后又成功地将一个元素入队，此时队列中的元素个数为(    )。",
+                    "options": {"A": "1", "B": "50", "C": "26", "D": "2"},
+                    "answer": "A",
+                    "analysis": "设循环队列的存储空间为Q(1:m)，当front=rear时，循环队列为空；当front=rear且不等于m时，循环队列可能为空，也可能为满。当为空时，可以插入元素；当为满时，插入元素会发生“上溢”错误。题目中已经说明“成功地将一个元素入队”，说明之前循环队列的状态为空，插入一个元素后，队列中共有1个元素。本题选择A选项。"
+                },
+                {
+                    "id": "0405",
+                    "title": "0405 - 设二叉树的前序序列为ABCDEF，中序序列为ABCDEF，则该二叉树的后序序列为(    ) 。",
+                    "options": {"A": "ABCDEF", "B": "FEDCBA", "C": "DEFCBA", "D": "CBAFED"},
+                    "answer": "B",
+                    "analysis": "二叉树遍历可以分为3种：前序遍历（访问根节点在访问左子树和访问右子树之前）、中序遍历（访问根节点在访问左子树和访问右子树两者之间）、后序遍历（访问根节点在访问左子树和访问右子树之后），并且在遍历左右子树时也遵循同样的规则。本题中，二叉树的前序序列为ABCDEF，可确定二叉树的根节点为A，由于后序序列最后访问根节点，可排除A、D两项；由中序序列为ABCDEF可知，以A为根节点的这棵二叉树不存在左子树，且由前序序列和中序序列相同可判断出每棵子树均不存在左子树（即只有右子树），后序序列先访问处于右子树上的节点F。本题选择B选项。"
+                },
+                {
+                    "id": "0406",
+                    "title": "0406 - 不属于对象构成成分的是(    ) 。",
+                    "options": {"A": "标识", "B": "属性", "C": "方法（或操作）", "D": "规则"},
+                    "answer": "D",
+                    "analysis": "对象是由描述该对象属性的数据以及可以对这些数据施加的所有操作封装在一起构成的统一体。一个对象通常可由对象名（标识）、属性和操作3部分组成。本题选择D选项。"
+                },
+                {
+                    "id": "0407",
+                    "title": "0407 - 软件工程的三要素是(    )。",
+                    "options": {"A": "方法、工具和环境", "B": "方法、工具和过程", "C": "方法、平台和管理", "D": "方法、工具和文档"},
+                    "answer": "B",
+                    "analysis": "软件工程包含方法、工具和过程3个要素。方法是完成软件开发各项任务的技术手段；工具支持软件的开发、管理、文档生成；过程支持软件开发的各个环节的控制、管理。本题选择B选项。"
+                },
+                {
+                    "id": "0408",
+                    "title": "0408 - 关于数据库管理阶段的特点，下列说法中错误的是(    ) 。",
+                    "options": {"A": "数据独立性差", "B": "数据的共享性高，冗余度低，易扩充", "C": "数据真正实现了结构化", "D": "数据由DBMS统一管理和控制"},
+                    "answer": "A",
+                    "analysis": "数据库管理阶段的数据库系统的基本特点：数据集成性、数据的共享性高，冗余性低、数据独立性高、数据统一管理与控制。本题选择A选项。"
+                },
+                {
+                    "id": "0409",
+                    "title": "0409 - 学校的每个社团都有一名团长，且一个同学可同时担任多个社团的团长，则实体团长和实体社团间的联系是(    ) 。",
+                    "options": {"A": "一对一", "B": "一对多", "C": "多对一", "D": "多对多"},
+                    "answer": "B",
+                    "analysis": "一个社团只能有一名团长，一个同学可以同时担任多个社团的团长，则团长和社团之间的联系是一对多。团长是一的一方，社团是多的一方。本题选择B选项。"
+                },
+                {
+                    "id": "0410",
+                    "title": "0410 - 如果定义班级关系如下：班级（班级号，总人数，所属学院，班级学生）则使它不满足第一范式的属性是(    )。",
+                    "options": {"A": "所属学院", "B": "班级号", "C": "总人数", "D": "班级学生"},
+                    "answer": "D",
+                    "analysis": "对于关系模式，若其中的每个属性都已经不能再分为简单项，则它属于第一范式。本题中，在关系模式“班级”中，属性“班级学生”又可以分为“学生学号”和“学生姓名”等，因此不满足第一范式。本题选择D选项。"
+                },
+                {
+                    "id": "0411",
+                    "title": "0411 - 在Python中，IPO模式不包括(    )。",
+                    "options": {"A": "Program（程序）", "B": "Input（输入）", "C": "Process（处理）", "D": "Output（输出）"},
+                    "answer": "A",
+                    "analysis": "在Python中，IPO模式的内容如下。I:Input（输入），程序的输入。程序的输入包括文件输入、网络输入、控制台输入、随机数据输入、程序内部参数输入等。输入是一个程序的开始。P:Process（处理），程序的主要处理逻辑。程序对输入进行处理，输出处理结果。处理的方法也叫算法，是程序最重要的部分。可以说，算法是一个程序的“灵魂”。O:Output（输出），程序的输出。程序的输出包括屏幕显示输出、文件输出、网络输出、操作系统内部变量输出等。输出是一个程序展示处理结果的方式。本题选择A选项。"
+                },
+                {
+                    "id": "0412",
+                    "title": "0412 - 拟在屏幕上输出Hello World，使用的Python语句是(    ) 。",
+                    "options": {"A": "printf('Hello World')", "B": "print(Hello World)", "C": "print(\"Hello World\")", "D": "printf(\"Hello World\")"},
+                    "answer": "C",
+                    "analysis": "在Python中，输出用print()函数，Hello World是字符串类型，需要加单引号或双引号。本题选择C选项。"
+                },
+                {
+                    "id": "0413",
+                    "title": "0413 - 以下关于二进制整数的定义，正确的是(    )。",
+                    "options": {"A": "0B1014", "B": "0b1010", "C": "0B1019", "D": "0bC3F"},
+                    "answer": "B",
+                    "analysis": "二进制整数以0b开头，后面跟二进制数0和1。A、C、D中有4、9、C、3、F，这些都不是二进制数。本题选择B选项。"
+                },
+                {
+                    "id": "0414",
+                    "title": "0414 - 以下关于Python的复数类型的描述中，错误的是(    )。",
+                    "options": {"A": "复数可以进行四则运算", "B": "实部不可以为0", "C": "Python可以使用z.real和a.imag分别获取它的实部和虚部", "D": "复数类型与数学中复数的概念一致"},
+                    "answer": "B",
+                    "analysis": "在Python中，复数类型表示数学中的复数，D项正确。复数可以看作二元有序实数对（a，b)，表示a+bj，其中a是实数部分，简称实部，b是虚数部分，简称虚部。虚数部分通过后缀“J”或“j”来表示，实部、虚部都可为0。复数可以进行四则运算。A选项正确，B选项错误。复数类型中，实部和虚部都是浮点数类型，对于复数z，可以使用z.real和a.imag分别获取它的实部和虚部，C选项正确。本题选择B选项。"
+                },
+                {
+                    "id": "0415",
+                    "title": "0415 - 以下变量名中，符合Python变量命名规则的是(    )。",
+                    "options": {"A": "33_keyword", "B": "key@word33_", "C": "nonlocal", "D": "_33keyword"},
+                    "answer": "D",
+                    "analysis": "Python采用大写字母、小写字母、数字、下划线及汉字等字符及其组合进行命名，但名字的首字符不能是数字，标识符中间不能出现空格，长度没有限制，变量名不能与关键字相同。本题选择D选项。"
+                },
+                {
+                    "id": "0416",
+                    "title": "0416 - 以下关于Python分支的描述中，错误的是(    )。",
+                    "options": {"A": "Python分支结构使用保留字if、elif及else来实现，每个if后面必须有 elif或else", "B": "if-else结构是可以嵌套的", "C": "if语句会判断if后面的逻辑表达式，当表达式为真时，执行if后面的语句块", "D": "缩进是Python分支语句的语法部分，缩进不正确会影响分支功能"},
+                    "answer": "A",
+                    "analysis": "Python分支结构使用关键字if、elif及else来实现，每个if后面不一定要有elif或else,A选项错误；if-else结构是可以嵌套的，B选项正确；if语句会判断if后面的逻辑表达式，当表达式为真时，执行if 后面的语句块，C选项正确；缩进是Python分支语句的语法部分，缩进不正确会影响分支功能，D选项正确。本题选择A选项。"
+                },
+                {
+                    "id": "0417",
+                    "title": "0417 - 列表变量ls共包含10个元素，ls索引的取值范围是(    ) 。",
+                    "options": {"A": "(0,10)", "B": "[0,10]", "C": "(1,10]", "D": "[0,9]"},
+                    "answer": "D",
+                    "analysis": "列表使用方括号作为索引操作符，索引从0开始，即第一个元素的索引是0，第二个元素的索引是1，依次类推。本题列表中有10个元素，则索引取值范围是［0,9］。本题选择D选项。"
+                },
+                {
+                    "id": "0418",
+                    "title": "0418 - 用键盘输入数字5，以下代码的输出结果是(    ) 。<br><pre><code>n=eval(input(\"请输入一个整数：\"))\ns=0\nif n>=5:\n    n-=1\n    s=4\nif n<5:\n    n-=1\n    s=3\nprint(s)</code></pre>",
+                    "options": {"A": "4", "B": "3", "C": "0", "D": "2"},
+                    "answer": "B",
+                    "analysis": "输入5，因为n=5满足第一个if条件，所以n=n-1,n=4,s=4;由于现在n=4，满足第二个if条件，所以执行n=n-1,n=3,s=3。 print(s)，输出3。本题选择B选项。"
+                },
+                {
+                    "id": "0419",
+                    "title": "0419 - 以下关于Python 循环结构的描述中，错误的是(    ) 。",
+                    "options": {"A": "while 循环使用关键字 continue 结束本次循环", "B": "while 循环可以使用保留字 break 和 continue", "C": "while 循环也叫遍历循环，用来遍历序列中的元素，默认提取每个元素并执行一次循环体", "D": "while 循环使用pass语句，则什么事也不做，只是空占位语句"},
+                    "answer": "C",
+                    "analysis": "Python中循环包括两种：遍历循环和无限循环。遍历循环使用关键字for依次提取遍历结构元素进行处理；无限循环使用关键字while 根据判断条件执行程序。循环结构有两个辅助循环控制关键字：break和continue。break 用于跳出最内层for或while 循环，脱离该循环后程序从循环后的代码继续执行。continue用于结束当前当次循环，即跳出循环体中下面尚未执行的语句，但不跳出当前循环。pass：什么事也不做，只是空占位语句，并且是无运算的占位语句。当语法需要语句并且没有任何使用的语句可写时，就可以使用它。pass通常用于为复合语句编写一个空的主体。如果写无限循环，每次迭代什么也不做，就写pass。pass是有意义的，如忽略try语句所捕获的异常，以及定义带属性的空类对象，而该类实现的对象行为就像其他语言的结构和记录。pass有时指“以后会填上”，只是暂时用于填充函数主体而已，无法保持函数体为空而不产生语法错误，因此、可以使用pass来替代。两者的区别：continue语句只结束本次循环，不终止整个循环的执行，而break具备结束循环的能力。本题选择C选项。"
+                },
+                {
+                    "id": "0420",
+                    "title": "0420 - 用键盘输入数字10，以下代码的输出结果是(    )。<br>try:<br>&nbsp;&nbsp;&nbsp;&nbsp;n=input(\"请输入一个整数：\")<br>&nbsp;&nbsp;&nbsp;&nbsp;def pow2(n):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return n*n<br>except:<br>&nbsp;&nbsp;&nbsp;&nbsp;print(\"程序执行错误\")",
+                    "options": {"A": "100", "B": "10", "C": "程序执行错误", "D": "程序没有任何输出"},
+                    "answer": "D",
+                    "analysis": "Python使用关键字try和except进行异常处理，语法格式如下。try:\n＜语句块1＞\nexcept:\n＜语句块2＞语句块1是正常执行的程序内容，当执行这个语句块发生异常时，则执行except关键字后面的语句块2。当输入10时，执行try后面的语句，n=10，函数pow2()只进行了定义，但未进行调用，所以此时程序只执行了输入语句，函数不执行，语句运行正常，并不执行except后面的语句，故程序没有任何输出。本题选择D 选项。"
+                },
+                {
+                    "id": "0421",
+                    "title": "0421 - 以下关于Python的return语句的描述中，正确的是(     )。",
+                    "options": {"A": "函数只能返回一个值", "B": "函数必须有return语句", "C": "函数可以没有return语句", "D": "函数中最多只有一个return语句"},
+                    "answer": "C",
+                    "analysis": "在Python中，return 语句用于结束函数并将程序返回到函数被调用的位置继续执行。return语句可以出现在函数中的任何部分，可以同时将0个、1个或多个函数运算结果返回给函数被调用处的变量。函数可以没有return语句，此时函数不返回值。当函数使用return语句返回多个值时，这些值形成了一个元组数据类型，由圆括号和逗号分隔，如（a,b,c)，可以使用一个变量或多个变量保存结果。本题选择C 选项。"
+                },
+                {
+                    "id": "0422",
+                    "title": "0422 - 以下关于Python全局变量和局部变量的描述中，错误的是(     ) 。",
+                    "options": {"A": "当函数退出时，局部变量依然存在，下次函数调用可以继续使用", "B": "全局变量一般指定义在函数之外的变量", "C": "使用global保留字声明后，变量可以作为全局变量使用", "D": "局部变量在函数内部创建和使用，函数退出后变量被释放"},
+                    "answer": "A",
+                    "analysis": "根据程序中变量所在的位置和作用范围，变量分为局部变量和全局变量。局部变量是指在函数内部定义的变量，仅在函数内部有效，且作用域也在函数内部。当函数退出时，该变量将不再存在。全局变量一般是指在函数之外定义的变量，在程序执行全过程有效。全局变量在函数内部使用时，需要提前使用关键字 global声明，语法格式为global＜全局变量＞。使用global对全局变量声明时，该变量要与外部全局变量同名。本题选择A选项。"
+                },
+                {
+                    "id": "0423",
+                    "title": "0423 - 以下代码的输出结果是(    )。\nCLis=list(range(5))\nprint(5 in CLis)",
+                    "options": {"A": "True", "B": "False", "C": "0", "D": "-1"},
+                    "answer": "B",
+                    "analysis": "range ()函数的语法为range(start,stop,step)，其作用是生成一个从start开始到stop（不含）结束的以step为步长的整数序列。CLis=list(range(5)）生成一个列表，包含0、1、2、3、4。因为5不在CLis列表中，故返回False。本题选择B选项。"
+                },
+                {
+                    "id": "0424",
+                    "title": "0424 - 关于以下代码的描述中，正确的是(    )。<br><pre><code>def fact(n):<br>    s=1<br>    for i in range(1,n+1):<br>        s *=i<br>    return s</code></pre>",
+                    "options": {"A": "代码中n是可选参数", "B": "fact(n）函数功能为求n的阶乘", "C": "s是全局变量", "D": "range()函数的范围是［1,n+1]"},
+                    "answer": "B",
+                    "analysis": "函数定义的语法格式如下。def ＜函数名＞(＜非可选参数列表＞,＜可选参数＞=＜默认值＞)：＜函数体＞return ＜返回值列表＞可选参数一般放置在非可选参数的后面。本题代码中，n为非可选参数，fact(n）函数的功能为求n的阶乘。s在函数内部定义，为局部变量。根据range()函数的定义，range(1,n+1）的范围是［1,n]，不包含n+1。本题选择B选项。"
+                },
+                {
+                    "id": "0425",
+                    "title": "0425 - 以下代码的输出结果是(    ) 。<br>def func(a,b):<br>&nbsp;&nbsp;&nbsp;&nbsp;a **=b<br>&nbsp;&nbsp;&nbsp;&nbsp;return a<br>s=func(2,5)<br>print(s)",
+                    "options": {"A": "10", "B": "20", "C": "32", "D": "5"},
+                    "answer": "C",
+                    "analysis": "该函数功能是计算a的b次方，运算符**表示幂运算，s=2**5=32。本题选择C选项。"
+                },
+                {
+                    "id": "0426",
+                    "title": "0426 - 以下代码的输出结果是(    )。<br>ls=[\"apple\",\"red\",\"orange\"]<br>def funC(a):<br>&nbsp;&nbsp;&nbsp;&nbsp;ls.append(a)<br>&nbsp;&nbsp;&nbsp;&nbsp;return<br>funC(\"yellow\")<br>print(ls)",
+                    "options": {"A": "[]", "B": "[\"apple\",\"red\",\"orange\"]", "C": "[\"yellow\"]", "D": "[\"apple\",\"red\",\"orange\",\"yellow\"]"},
+                    "answer": "D",
+                    "analysis": "列表ls中有3个元素，函数funC(\"yellow\")将yellow传递给形参a，用append ()方法将a 中内容添加到列表ls中，最后返回，故最终的ls=[\"apple\",\"red\",\"orange\",\"yellow\"]，print(ls)，即将列表ls 中的内容输出。本题选择D选项。"
+                },
+                {
+                    "id": "0427",
+                    "title": "0427 - 以下描述中，错误的是(    )。",
+                    "options": {"A": "Python通过索引来访问列表中元素，索引可以是负整数", "B": "列表用方括号来定义，继承了序列类型的所有属性和方法", "C": "Python列表是各种类型数据的集合，列表中的元素不能够被修改", "D": "Python的列表类型能够包含其他的组合数据类型"},
+                    "answer": "C",
+                    "analysis": "列表用方括号（[]）表示，由于列表属于序列类型，因此继承了序列类型的所有属性和方法，B选项正确。索引是列表的基本操作，用于获得列表中的一个元素，该操作沿用序列类型的索引方式，即正向递增索引或反向递减索引，使用方括号作为索引操作符，索引不得超过列表的元素范围，否则将产生IndexError错误，A选项正确。列表可以进行元素增加、删除、替换、查找等操作，列表没有长度限制，元素类型可以不同，能够包含其他的组合数据类型，故D选项正确、C选项错误。本题选择C选项。"
+                },
+                {
+                    "id": "0428",
+                    "title": "0428 - 以下描述中，正确的是(    ) 。",
+                    "options": {"A": "如果s是一个序列，s=[1,\"kate\",True],s[3]返回True", "B": "如果x不是s的元素，x not in s返回True", "C": "如果x是s的元素，x in s返回1", "D": "如果s是一个序列，s=[1,\"kate\",False],s[-1]返回True"},
+                    "answer": "B",
+                    "analysis": "序列的索引从0开始，所以s=[1,\"kate\",True]时,s[3]超出索引范围，返回错误，A选项错误。x in s（如果x是s的元素，返回True；否则返回False);x not in s（如果x不是s的元素，返回True；否则返回False)，B选项正确、C选项错误。序列类型使用的索引可以是正向递增索引（从0开始递增），也可以是反向递减索引（从-1开始递减），所以s[-1]=False，返回的是False,D选项错误。本题选择B选项。"
+                },
+                {
+                    "id": "0429",
+                    "title": "0429 - 以下代码的输出结果是(    ) 。<br>S=\"Pame\"<br>for i in range(len(S)):<br>&nbsp;&nbsp;&nbsp;&nbsp;print(S[-i],end=\"\")",
+                    "options": {"A": "Pame", "B": "emaP", "C": "ameP", "D": "Pema"},
+                    "answer": "D",
+                    "analysis": "range()函数的语法格式为range(start,stop,step)，其作用是生成一个从start开始到stop （不含）结束的以step为步长的整数序列。一般默认start为0，步长step=1，如range(5)，生成0、1、2、3、4。len(S)=4，for i in range(4）表示i从0开始取值，当i=0时，print(S[0],end=\"\")，输出P;当i=1时，print (S[-1],end=\"\")，输出e;当i=2时，print(S[-2],end=\"\")，输出m；当i=3时，print(S[-3],end=\"\")，输出a。故代码输出结果为Pema。本题选择D选项。"
+                },
+                {
+                    "id": "0430",
+                    "title": "0430 - 以下代码的输出结果是(    ) 。<br>for s in \"HelloWorld\":<br>&nbsp;&nbsp;&nbsp;&nbsp;if s==\"W\":<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>&nbsp;&nbsp;&nbsp;&nbsp;print(s,end=\"\")",
+                    "options": {"A": "World", "B": "Hello", "C": "Helloorld", "D": "Hello World"},
+                    "answer": "C",
+                    "analysis": "for s in \"HelloWorld\"：将字符串 HelloWorld中的字符依次赋给变量s，之后进行if判断，如果s=\"W\"，则continue，执行下一个循环，不执行print(s,end=\"\")，否则执行print(s,end=\"\")，所以最后输出的结果是Helloorld。本题选择C选项。"
+                },
+                {
+                    "id": "0431",
+                    "title": "0431 - 下面的d是一个字典变量，能够输出数字2的语句是(    )。\nd={'food':{'cake':1,'egg':5},'cake':2,'egg':3}",
+                    "options": {"A": "print(d['food']['egg'])", "B": "print(d['cake'])", "C": "print(d['food'][-1])", "D": "print(d['cake'][1])"},
+                    "answer": "B",
+                    "analysis": "在Python中，字典是存储可变数量键值对的数据结构，键和值可以是任意数据类型，通过键索引值，并可以通过键修改值。因此，可以直接利用键值对关系索引元素。索引语法格式为＜值>=＜字典变量＞[＜键＞］。故能够正确索引字典并输出数字2的语句是print(d['cake']）。本题选择B选项。"
+                },
+                {
+                    "id": "0432",
+                    "title": "0432 - 以下代码的输出结果是(    ) 。\ns=[4,2,9,1]\ns.insert(3,3)\nprint(s)",
+                    "options": {"A": "[4,2,9,1,2,3]", "B": "[4,3,2,9,1]", "C": "[4,2,9,2,1]", "D": "[4,2,9,3,1]"},
+                    "answer": "D",
+                    "analysis": "在Python中，想要在列表中的任意位置插入元素，一般使用insert()方法。insert()方法有两个参数：第一个参数代表在列表中的位置，第二个参数是在这个位置处插入的元素。注意：插入时，是插在该位置之前。列表下标从0开始，s=[4,2,9,1],s[3]=1，则执行s.insert(3,3）后，s=[4,2,9,3,1]，最后print(s）。本题选择D选项。"
+                },
+                {
+                    "id": "0433",
+                    "title": "0433 - 在Python中，进行写文件操作时定位到某个位置所用到的方法是(    ) 。",
+                    "options": {"A": "write()", "B": "writeall()", "C": "seek()", "D": "writetext()"},
+                    "answer": "C",
+                    "analysis": "在Python中，进行写文件操作时定位到某个位置所用到的方法是seek()。设f为文件变量，用法为f.seek(offset)；含义为改变当前文件操作指针的位置；offset的值为0表示文件开头，为2表示文件结尾。本题选择C选项。"
+                },
+                {
+                    "id": "0434",
+                    "title": "0434 - 以下对Python文件处理的描述中，错误的是(    )。",
+                    "options": {"A": "当文件以文本方式打开时，读／写按照字节流方式", "B": "Python 能够以文本和二进制两种方式处理文件", "C": "Python通过解释器内置的open( )函数打开一个文件", "D": "文件使用结束后可以用close()方法关闭，释放文件的使用授权"},
+                    "answer": "A",
+                    "analysis": "文件包括文本文件和二进制文件两种类型。Python对文本文件和二进制文件采用统一的操作步骤，即打开一操作一关闭，故B选项正确。采用文本方式读入文件，文件经过编码形成字符串，输出有含义的字符；采用二进制方式打开文件，文件被解析为字节流，故A选项错误。Python通过open() 函数打开一个文件，并返回一个操作这个文件的变量，语法格式为＜变量名＞=open( ＜文件路径及文件名＞,＜打开模式＞)，故C选项正确。文件使用结束后要用close()方法关闭，释放文件的使用授权，语法格式为＜变量名>.close()，故D选项正确。本题选择A选项。"
+                },
+                {
+                    "id": "0435",
+                    "title": "0435 - 以下关于Python二维数据的描述中，错误的是(    )。",
+                    "options": {"A": "表格数据属于二维数据，由整数索引的数据构成", "B": "二维数据由多条一维数据构成，可以看作一维数据的组合形式", "C": "一种通用的二维数据存储文件是CSV文件", "D": "CSV文件的每行表示一个一维数据，用英文逗号分隔"},
+                    "answer": "A",
+                    "analysis": "二维数据也称表格数据，由关联关系数据构成，故A选项错误。二维数据由多个一维数据构成，可以看作一维数据的组合形式，故B选项正确。CSV文件是二维数据的存储文件，故C选项正确。CSV文件的每行是一维数据，用逗号分隔，故D选项正确。本题选择A选项。"
+                },
+                {
+                    "id": "0436",
+                    "title": "0436 - 在Python中，读入CSV文件保存的二维数据，按特定分隔符抽取信息，最可能用到的函数是(    ) 。",
+                    "options": {"A": "read ()", "B": "join()", "C": "replace()", "D": "split()"},
+                    "answer": "D",
+                    "analysis": "在Python中，读取CSV文件中的二维数据可采用遍历循环和字符串的split()方法结合的方式。例如：f=open(\"cpi.csv\",\"r\")\nls=[]\nfor line in f:\n    ls.append (line.strip(\"\\n\").split(\",\"))\nf.close()。本题选择D选项。"
+                },
+                {
+                    "id": "0437",
+                    "title": "0437 - 以下代码执行后，book.txt文件的内容是(    )。<br>fo=open(\"book.txt\",\"w\")<br>ls = ['book', '23', '201009', '20']<br>fo.write(str(ls))<br>fo.close()",
+                    "options": {"A": "['book', '23','201009','20']", "B": "book,23,201009,20", "C": "[book,23,201009,20]", "D": "book2320100920"},
+                    "answer": "A",
+                    "analysis": "执行fo=open(\"book.txt\",\"w\")，打开“book.txt”文本文件，打开模式为“w”（覆盖式）；创建列表ls = ['book',' 23','201009','20'];str()函数返回一个对象的字符串格式，str(ls）返回ls的字符串形式，fo.write(str(ls)）将返回的字符串写入“book.txt”文本文件中。本题选择A选项。"
+                },
+                {
+                    "id": "0438",
+                    "title": "0438 - 在Python中，属于网络爬虫领域的第三方库是(    ) 。",
+                    "options": {"A": "wordcloud", "B": "NumPy", "C": "Scrapy", "D": "PyQt5"},
+                    "answer": "C",
+                    "analysis": "属于网络爬虫领域的第三方库是Scrapy;NumPy库是Python在数据分析方面的第三方库；使用wordcloud可以方便地生成词云图，这是Python在数据可视化方面的第三方库；PyQt5库是Python 在图形界面方向的第三方库。本题选择C选项。"
+                },
+                {
+                    "id": "0439",
+                    "title": "0439 - 在Python中，用于数据分析的第三方库是(    )。",
+                    "options": {"A": "pandas", "B": "PIL", "C": "Django", "D": "Flask"},
+                    "answer": "A",
+                    "analysis": "用于数据分析的第三方库是pandas,PIL是Python在图像处理方面的第三方库，Django和Flask库是Python在Web开发方向的第三方库。本题选择A选项。"
+                },
+                {
+                    "id": "0440",
+                    "title": "0440 - 在Python中，不属于机器学习领域第三方库的是(    )。",
+                    "options": {"A": "TensorFlow", "B": "time", "C": "PyTorch", "D": "MXNet"},
+                    "answer": "B",
+                    "analysis": "在Python中，time是Python重要的标准库之一，用于处理时间相关的问题，不属于机器学习领域的第三方库。TensorFlow、PyTorch、MXNet均属于机器学习领域的第三方库。本题选择B选项。"
+                }
+            ]
+        },
+        paper5: {
+            name: "第5套题",
+            questions:[
+                {
+                    "id": "0501",
+                    "title": "0501 - 下列叙述中正确的是(    )。",
+                    "options": {"A": "循环链表中至少有一个节点", "B": "双向链表有两个头指针", "C": "双向链表有两个头节点", "D": "循环链表是循环队列的链式存储结构"},
+                    "answer": "A",
+                    "analysis": "循环链表是指在单链表的第一个节点前增加一个表头节点，即空循环链表和非空循环链表中均存在表头节点，故循环链表中至少有一个节点，A选项正确。循环链表是线性表的一种链式存储结构，循环队列是队列的一种顺序存储结构，故D选项错误。双向链表也叫双链表，是链表的一种，它的每个数据节点中都有两个指针（左指针和右指针），分别指向其前件节点和后件节点，故C选项错误。双向链表中只有一个头指针且无头节点，故B选项错误。本题选择A选项。"
+                },
+                 {
+                    "id": "0502",
+                    "title": "0502 - 下列算法中，最坏情况下时间复杂度最低的是(    ) 。",
+                    "options": {"A": "堆排序", "B": "寻找最大项", "C": "顺序查找", "D": "有序表的二分法查找"},
+                    "answer": "D",
+                    "analysis": "对于长度为n的有序线性表，在最坏情况下，二分法查找需比较log2n次。对于长度为n的线性表，最坏情况下顺序查找需要n次，寻找最大项需要n-1次，堆排序需要nlog2n次。故D选项的时间复杂度最低。本题选择D选项。"
+                },
+                {
+                    "id": "0503",
+                    "title": "0503 - 树的度为3，且有9个度为3的节点，20个叶子节点，但没有度为1的节点，则该树总的节点数为(     )。",
+                    "options": {"A": "29", "B": "30", "C": "47", "D": "不可能有这样的树"},
+                    "answer": "B",
+                    "analysis": "设总节点数是n，则度为2的节点为n-9-20-0=n-29。根据树中的节点数＝树中所有节点的度之和＋1，有9×3+(n-29)×2+0×1+20×0+1=n解得n=30。本题选择B选项。"
+                },
+                {
+                    "id": "0504",
+                    "title": "0504 - 设二叉树的中序序列为BDCA，后序序列为DCBA，则前序序列为(    )。",
+                    "options": {"A": "BCDA", "B": "CBDA", "C": "ABCD", "D": "ACDB"},
+                    "answer": "C",
+                    "analysis": "由于后序序列最后遍历根节点，故可确定该二叉树的根节点为A。根据前序序列首先访问根节点A，可排除A、B两项。由中序序列为BDCA，可确定该二叉树只有左子树，没有右子树；再由后序序列为DCBA，可确定左子树的根节点为B。前序序列访问完该树的根节点A后，再访问左子树的根节点B。本题选择C选项。"
+                },
+                {
+                    "id": "0505",
+                    "title": "0505 - 下列选项描述正确的是(    ) 。",
+                    "options": {"A": "软件测试是软件调试的一部分", "B": "软件测试是证明软件正确的方法", "C": "软件测试的目的是发现程序中的错误", "D": "软件测试是保障软件质量的唯一方法"},
+                    "answer": "C",
+                    "analysis": "软件测试的目的是发现程序中的错误。调试是作为成功测试的后果而出现的步骤，也就是说，调试是在测试发现错误之后排除错误的过程。软件调试的任务是诊断和改正程序中的错误。本题选择C 选项。"
+                },
+                {
+                    "id": "0506",
+                    "title": "0506 - 对软件系统总体结构图描述正确的是(    )。",
+                    "options": {"A": "深度等于控制的层数", "B": "扇入是一个模块直接调用的其他模块数", "C": "结构图是描述软件系统功能的", "D": "从属模块一定是原子模块"},
+                    "answer": "A",
+                    "analysis": "扇入是指调用一个给定模块的模块个数，扇出是指由一个模块直接调用的其他模块个数，故B选项错误。从属模块是指被另一个模块调用的模块。原子模块是从属模块，但从属模块不一定是原子模块，故D选项错误。结构图是描述软件结构的图形工具，故C选项错误。本题选择A选项。"
+                },
+                {
+                    "id": "0507",
+                    "title": "0507 - 下面属于应用软件的是(     ) 。",
+                    "options": {"A": "安卓（Android）操作系统", "B": "交通管理软件", "C": "C语言编译器", "D": "数据库管理系统"},
+                    "answer": "B",
+                    "analysis": "计算机软件按功能分为应用软件、系统软件、支撑软件（或工具软件）。安卓（Android）操作系统、数据库管理系统均属于系统软件，C语言编译器属于支撑软件，交通管理软件属于应用软件。本题选择B选项。"
+                },
+                {
+                    "id": "0508",
+                    "title": "0508 - 概念模型是(    ) 。",
+                    "options": {"A": "用于现实世界的建模，与具体的数据库管理系统有关", "B": "用于信息世界的建模，与具体的数据库管理系统有关", "C": "用于现实世界的建模，与具体的数据库管理系统无关", "D": "用于信息世界的建模，与具体的数据库管理系统无关"},
+                    "answer": "C",
+                    "analysis": "概念模型着重于对客观世界复杂事物的描述及对它们内在联系的刻画，与具体的数据库管理系统无关。本题选择C选项。"
+                },
+                {
+                    "id": "0509",
+                    "title": "0509 - 教师和授课班级之间的联系是(     ) 。",
+                    "options": {"A": "一对一", "B": "一对多", "C": "多对一", "D": "多对多"},
+                    "answer": "D",
+                    "analysis": "一位教师可以对多个班级授课，一个班级也可以由多位教师授课，因此，教师和授课班级之间的联系是多对多联系。本题选择D选项。"
+                },
+                {
+                    "id": "0510",
+                    "title": "0510 - 定义学生选修课程的关系模式如下：SC(S#,Sn,C#,Cn,G,Cr)（其属性分别为学号、姓名、课程号、课程名、成绩、学分）则对主属性部分依赖的是(     )。",
+                    "options": {"A": "C#→Cr", "B": "(S#,C#)→G", "C": "(S#,C#)→S#", "D": "(S#,C#)→C#"},
+                    "answer": "A",
+                    "analysis": "关系SC的主属性为（S#,C#)，但C＃→Cr属于非主属性对主属性的部分依赖。本题选择A 选项。"
+                },
+                {
+                    "id": "0511",
+                    "title": "0511 - 以下不是Python所使用的特殊含义符号的是(    ) 。",
+                    "options": {"A": "S", "B": "**", "C": "&", "D": "+="},
+                    "answer": "A",
+                    "analysis": "在Python中，有特殊含义的符号包括＋、-、*、/、％、**、//、==、!=、>、<、>=、<=、=、+=、-=、*=、/=、%=、**=、//=、&、|、^、~、<<、>>、&=、|=、^=、~=。本题选择A选项。"
+                },
+                {
+                    "id": "0512",
+                    "title": "0512 - 以下不是Python关键字的是(     )。",
+                    "options": {"A": "await", "B": "pass", "C": "do", "D": "lambda"},
+                    "answer": "C",
+                    "analysis": "关键字也称保留字，是编程语言内部定义并保留使用的标识符。Python 3.x的关键字有35个，分别是and、as、assert、async、await、break、class、continue、def、del、elif、else、except、False、finally、for、from、global、if、import、in、is、lambda、None、nonlocal、not、or、pass、raise、return、True、try、with、while、yield。本题选择C 选项。"
+                }, {
+                    "id": "0513",
+                    "title": "0513 - 以下关键字不用于循环逻辑的是(    ) 。",
+                    "options": {"A": "try", "B": "else", "C": "for", "D": "continue"},
+                    "answer": "A",
+                    "analysis": "用于循环逻辑的关键字有 while、for、else、break、continue。try用于捕捉异常。本题选择A 选项。"
+                },
+                {
+                    "id": "0514",
+                    "title": "0514 - s='1234567890'，以下表示'1234'的选项是(    )。",
+                    "options": {"A": "s[1:5]", "B": "s[0:3]", "C": "s[-10:-5]", "D": "s[0:4]"},
+                    "answer": "D",
+                    "analysis": "对字符串中某个子串或区间的检索称为切片。切片的语法格式如下。＜字符串或字符串变量＞[N:M］切片获取字符串从N到M（不包含M）的子字符串，其中N和M为字符串的索引，可以混合使用正向递增索引和反向递减索引。切片要求N和M都在字符串的索引区间，如果N大于等于M，则返回空字符串；如果N缺失，则默认将N设为0；如果M缺失，则默认表示到字符串结尾。选项中，s[1:5]='2345'、s[0:3]='123'、s[-10:-5]='12345'、s[0:4]='1234'。本题选择D选项。"
+                }, {
+                    "id": "0515",
+                    "title": "0515 - 表达式3+5%6*2//8的值是(    )。",
+                    "options": {"A": "5", "B": "4", "C": "6", "D": "7"},
+                    "answer": "B",
+                    "analysis": "根据运算符的优先级，运算顺序为5%6=5、5*2=10、10//8=1、3+1=4。 本题选择B选项。"
+                },
+                {
+                    "id": "0516",
+                    "title": "0516 - 以下不是函数作用的选项是(     )。",
+                    "options": {"A": "提高代码执行速度", "B": "增强代码可读性", "C": "复用相同功能代码", "D": "降低编程复杂度"},
+                    "answer": "A",
+                    "analysis": "函数是一段具有特定功能的、可重用的语句组，它通过函数名来标识和调用。使用函数可以降低编程复杂度和增加代码复用，增强代码可读性。本题选择A选项。"
+                },{
+                    "id": "0517",
+                    "title": "0517 - 关于Python全局变量和局部变量的描述错误的是(    )。",
+                    "options": {"A": "全局变量在源文件顶层，一般没有缩进", "B": "程序中的变量包含两类：全局变量和局部变量", "C": "函数内部使用各种全局变量，都要用global语句声明", "D": "不是在程序最开头定义的全局变量，不是全过程均有效"},
+                    "answer": "C",
+                    "analysis": "根据程序中变量所在的位置和作用范围，变量分为全局变量和局部变量。局部变量是在函数内部定义的变量，仅在函数内部有效，且作用域也在函数内部，当函数退出时变量将不再存在。全局变量是在函数之外定义的变量，在程序执行的全过程有效。全局变量在函数内部修改时，才需要提前使用关键字global声明，语法格式为global＜全局变量＞。使用global对全局变量声明时，该变量要与外部全局变量同名。本题选择C选项。"
+                },
+                {
+                    "id": "0518",
+                    "title": "0518 - 关于函数定义的形式错误的是(    ) 。",
+                    "options": {"A": "def foo(*a,b)", "B": "def foo(a,b=10)", "C": "def f(a,*b)", "D": "def foo(a,b)"},
+                    "answer": "A",
+                    "analysis": "在Python中定义函数时，不仅可以设置普通的形参，如def fun(arr1, arr2='我是2班数')（其中arr1为必选参数，arr2为可选参数），还可以传入两种特殊的参数，即带*和**的参数。这两种特殊的参数都可以传入任意数量的实参，它们的不同点主要在于*参数传入的是一个元组，**参数传入的是一个字典。由于传入的参数数量不确定，因此，当它们与普通参数放在一起时，必须把它们放在最后。本题选择A选项。"
+                }, {
+                    "id": "0519",
+                    "title": "0519 - 字典d={'Python':123,'C':123,'C++':123},len(d）的结果是(    )。",
+                    "options": {"A": "12", "B": "6", "C": "9", "D": "3"},
+                    "answer": "D",
+                    "analysis": "len(d）方法用于返回字典d的键值对个数。字典的每个键值对用冒号（:）连接，不同键值对之间用逗号（,）隔开，整个字典包括在花括号（{}）中。字典d中共有3个键值对，故len(d)=3。本题选择D选项。"
+                },
+                {
+                    "id": "0520",
+                    "title": "0520 - 以下不是Python组合数据类型的是(    )。",
+                    "options": {"A": "元组类型", "B": "字符串类型", "C": "数组类型", "D": "列表类型"},
+                    "answer": "C",
+                    "analysis": "能表示多个数据的类型称为组合数据类型。Python中最常用的组合数据类型有三种，分别是集合类型、序列类型（典型代表是字符串类型和列表类型）及映射类型（典型代表是字典类型）。Python中的数据类型不包括数组类型，数组类型需要通过引用第三方库（如Numpy）实现。本题选择C选项。"
+                },{
+                    "id": "0521",
+                    "title": "0521 - 对于序列s，能够返回序列s中第i到第j且以k为步长的子序列的表达是(    ) 。",
+                    "options": {"A": "s[i:j:k]", "B": "s[i,j,k]", "C": "s[i;j;k]", "D": "s(i,j,k)"},
+                    "answer": "A",
+                    "analysis": "序列切片的方式为＜序列＞［起始索引：结束索引：步长］。在［］中表示区间时，使用冒号（:）。本题选择A选项。"
+                },
+                {
+                    "id": "0522",
+                    "title": "0522 - 基于序列s，对min(s）描述正确的是(    )。",
+                    "options": {"A": "可以返回序列s中的最小元素，如果存在多个相同的最小元素，则返回一个列表类型", "B": "一定能够返回序列s中的最小元素", "C": "可以返回序列s中的最小元素，如果存在多个相同的最小元素，则返回一个元组类型", "D": "可以返回序列s中的最小元素，但要求s中元素可比较"},
+                    "answer": "D",
+                    "analysis": "min()函数用于返回给定参数的最小值，但是要求给定参数是可以比较的。若给定参数不能比较，则会报错；若给定的参数存在多个最小元素，则min()只会返回序列中最小的一个元素。本题选择D选项。"
+                },
+                {
+                    "id": "0523",
+                    "title": "0523 - 以下程序的输出结果是(    ) 。\nx=10<br>y=0<br>if(x>5)or(x/y>5):<br>&nbsp;&nbsp;&nbsp;&nbsp;print('Right')<br>else:<br>&nbsp;&nbsp;&nbsp;&nbsp;print('Wrong')",
+                    "options": {"A": "Right", "B": "Wrong", "C": "报错：ZeroDivisionError", "D": "不报错，但不输出任何结果"},
+                    "answer": "A",
+                    "analysis": "在Python中，or表示多个条件之间的\"或\"关系。若x为True，则x or y的结果为True，不再对y进行判断（短路求值）。本题中，x>5为True，故(x>5) or (x/y>5)的结果为True，右侧的x/y>5不会被执行（避免了ZeroDivisionError），输出结果为Right。本题选择A选项。"
+                },
+                {
+                    "id": "0524",
+                    "title": "0524 - 以下程序的输出结果是(    )。<br>for c in 'Python NCRE':<br>&nbsp;&nbsp;&nbsp;&nbsp;if c=='N':<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break<br>&nbsp;&nbsp;&nbsp;&nbsp;print(c)",
+                    "options": {"A": "无输出", "B": "Python", "C": "Pytho", "D": "Python CRE"},
+                    "answer": "C",
+                    "analysis": "本题中，for循环遍历字符串'Python NCRE'，当遇到字符'N'之前，会依次输出'P'、'y'、't'、'h'、'o'。当c的值为'N'时，if条件成立，执行break语句跳出循环，不再继续执行循环体中break后面的语句，因此输出结果是'Pytho'。本题选择C选项。"
+                },
+                {
+                    "id": "0525",
+                    "title": "0525 - 以下程序的输出结果是(    )。<br>s=2<br>for i in range(1,10):<br>&nbsp;&nbsp;&nbsp;&nbsp;s+=i<br>print(s)",
+                    "options": {"A": "55", "B": "45", "C": "57", "D": "47"},
+                    "answer": "D",
+                    "analysis": "range(1,10）的返回值为1、2、3、4、5、6、7、8、9，即for循环中i的取值范围为[1,9]。题目中s=2+1+2+⋯+9=2+(1+2+...+9)=2+45=47。本题选择D选项。"
+                },
+                {
+                    "id": "0526",
+                    "title": "0526 - 以下程序被调用后，能够正确执行的是(    )。<br>def f(x,y=1,z=2):<br>&nbsp;&nbsp;&nbsp;&nbsp;pass",
+                    "options": {"A": "f(x=1,2)", "B": "f(x=1,y=2,z=3)", "C": "f(1,x=2,z=3)", "D": "f(1,y=2,3)"},
+                    "answer": "B",
+                    "analysis": "函数的参数在定义时可以指定默认值，当函数被调用时，如果没有传入对应的参数，则使用函数定义时的默认值代替。本题在定义函数时,y=1和z=2就已指定默认值。函数调用时，参数传递主要方式有位置传递和关键字传递两种。位置传递是根据函数定义的参数位置来传递参数；关键字传递是根据每个参数的名字传递参数，该方式不用区分参数顺序位置，名字正确即可。关键字传递可以和位置传递混用，但混用时位置参数要出现在关键字参数之前。A选项中，第1个参数为关键字传递，第2个参数为位置传递，混用顺序不对；D选项中，第2个参数为关键字传递，第3个参数为位置传递，混用顺序不对；C选项中第1个参数已经使用位置传递（将1传递给x)，第2个参数又使用关键字传递将2传递给x，会出现重复赋值错误。本题选择B选项。"
+                },
+                {
+                    "id": "0527",
+                    "title": "0527 - 以下程序的输出结果是(    ) 。ls=['绿茶','乌龙茶','红茶','白茶','黑茶']\nx='乌龙茶'\nprint(ls.index(x,0))",
+                    "options": {"A": "-3", "B": "0", "C": "1", "D": "-4"},
+                    "answer": "C",
+                    "analysis": "列表的index()方法用于从列表中找出某个对象的第一个匹配项的索引，如果该对象不在列表中会报异常错误。其语法格式为list.index(obj[,start=0[, stop=len(L)]]），其中obj是指要查找的对象；start为可选参数，指从哪个索引开始查找，默认为0;stop为可选参数，指查找范围的结束位置，默认为列表的长度。本题中，查找对象为\"乌龙茶\"，从索引为0处开始查找，查找到第2个元素正好匹配，返回其索引1。本题选择C选项。"
+                },
+                {
+                    "id": "0528",
+                    "title": "0528 - 关于字典的描述，错误的是(    ) 。",
+                    "options": {"A": "字典的元素以键为索引进行访问", "B": "字典的一个键可以对应多个值", "C": "字典长度是可变的", "D": "字典是键值对的结合，键值对之间没有顺序"},
+                    "answer": "B",
+                    "analysis": "在Python中，字典是存储可变数量键值对的数据结构，通过字典类型实现映射。一个键只能对应一个值，键必须是唯一的，且必须是不可变数据类型，值可以是任何数据类型。字典具有和集合类似的性质，即键值对之间没有顺序且不能重复。字典可以通过\"字典['键']\"的形式访问对应的元素，即以键为索引进行访问。本题选择B选项。"
+                },
+                {
+                    "id": "0529",
+                    "title": "0529 - 以下不是Python中文件读／写方法的是(    ) 。",
+                    "options": {"A": "writeline", "B": "readline", "C": "read", "D": "write"},
+                    "answer": "A",
+                    "analysis": "在Python中，文件的读／写方法（file表示使用open()函数创建的对象）如下：file.read([size])：参数可选，若未给定参数或参数为负，则读取整个文件的内容；若给定参数，则读取size长度的字符串或字节流。file.readline([size])：参数可选，若未给定参数或参数为负，则读取一行内容；若给定参数，则读取不大于size长度的字符串或字节流。file.readlines([hint])：参数可选，若未给定参数或参数为负，则从文件中读取所有行，以每行为元素形成一个列表；若给定参数，则读取hint行。file.write(str)：将字符串或字节流写入文件。file.writelines(lines)：向文件写入一个序列字符串列表。本题选择A选项。"
+                },
+                {
+                    "id": "0530",
+                    "title": "0530 - 关于Python中的文件打开模式，表示错误的是(    ) 。",
+                    "options": {"A": "rt", "B": "nb", "C": "ab", "D": "wt"},
+                    "answer": "B",
+                    "analysis": "在Python中，open()函数提供了7种基本的文件打开模式：r、w、x、a、b、t、+。其中,r、w、x、a可以和b、t、＋组合使用。本题选择B选项。"
+                },
+                {
+                    "id": "0531",
+                    "title": "0531 - 表格类型数据的组织维度最可能是(    ) 。",
+                    "options": {"A": "多维数据", "B": "一维数据", "C": "二维数据", "D": "高维数据"},
+                    "answer": "C",
+                    "analysis": "一维数据由对等关系的有序或无序数据构成，采用线性方式组织；二维数据也称表格数据，由关联关系数据构成，采用二维表格方式组织；高维数据由键值对类型的数据构成，采用对象方式组织。本题选择C选项。"
+                },
+                {
+                    "id": "0532",
+                    "title": "0532 - 二维列表ls=[[9,8],[7,6],[5,4],[3,2],[1,0]]，能够获得数字4的选项是(    ) 。",
+                    "options": {"A": "ls[-3][-1]", "B": "ls[3][-1]", "C": "ls[2][0]", "D": "ls[-2][0]"},
+                    "answer": "A",
+                    "analysis": "本题考查列表取值。要取得数字4，首先可以通过ls[-3］或ls[2］的方式取得ls的第3个元素[5,4]，然后通过[5,4][-1］或[5,4][1］的方式取得4。因此，ls[-3][-1］、ls[-3][1］、ls[2][-1］或ls[2][1］都可以取得数字4。本题选择A选项。"
+                },
+                {
+                    "id": "0533",
+                    "title": "0533 - 在进行CSV文件的读／写时，最不可能使用的字符串处理方法是(    )。",
+                    "options": {"A": "strip ()", "B": "join()", "C": "index()", "D": "split()"},
+                    "answer": "C",
+                    "analysis": "CSV文件中以逗号分隔数据，形成一行。在进行CSV文件的读／写时，常用的字符串处理方法有strip( )、join()、split()。其中，strip()方法用于删除文件开头和结尾的给定字符序列，参数为空时，默认删除空白符（包括'\\n'、'\\r'、'\\t'、' '）。join()方法用于将数据以指定的字符（分隔符）连接成一个新的序列。split()方法用于将数据按某一个字符或字符串进行分割。index( )方法用于检测字符串中是否包含指定子字符串。在进行CSV文件读写时，相较于前面3种方法，index()方法最不可能使用。本题选择C选项。"
+                },
+                {
+                    "id": "0534",
+                    "title": "0534 - f=open ()可以打开一个文件，关于f的描述错误的是(    ) 。",
+                    "options": {"A": "f是文件对象的引用，在程序中表示打开的文件", "B": "f是一种特殊的Python变量，执行print(f）时会报错", "C": "f.read( )可以一次性读入文件的全部信息", "D": "执行m=f后，m和f同时表示所打开的文件对象"},
+                    "answer": "B",
+                    "analysis": "由f=open()可知，f是文件对象的引用，在程序中f代表打开的文件，执行print(f）不会报错，故B选项错误、A选项正确；f.read ()方法中如果不给定参数，则从文件中读入整个文件的内容，故C选项正确；执行m=f后，m也是该文件对象的引用，m与f都表示该打开文件对象，故D选项正确。本题选择B 选项。"
+                },
+                {
+                    "id": "0535",
+                    "title": "0535 - 下列函数中，不是Python内置函数的是(    )。",
+                    "options": {"A": "perf_counter ()", "B": "all()", "C": "abs()", "D": "format()"},
+                    "answer": "A",
+                    "analysis": "perf_counter ()是time库的函数，调用该函数需要先导入time库。本题选择A选项。"
+                },
+                  {
+                    "id": "0536",
+                    "title": "0536 - 安装一个第三方库的命名格式是(    )。",
+                    "options": {"A": "pip uninstall ＜第三方库名＞", "B": "pip install ＜第三方库名＞", "C": "pip download ＜第三方库名＞", "D": "pip search ＜第三方库名＞"},
+                    "answer": "B",
+                    "analysis": "pip install ＜第三方库名＞：安装第三方库；pip uninstall ＜第三方库名＞：卸载一个已经安装的第三方库；pip download ＜第三方库名＞：下载第三方库的安装包，但并不安装；pip search ＜第三方库名＞：联网搜索库名或摘要中的关键字。本题选择B选项。"
+                },
+                {
+                    "id": "0537",
+                    "title": "0537 - 生成一个区间为［1,99］的随机整数的函数是(    )。",
+                    "options": {"A": "random.randint(1,100)", "B": "random.randint(0,99)", "C": "random.randint(1,99)", "D": "random.uniform(1,99)"},
+                    "answer": "C",
+                    "analysis": "random.randint(a,b）用于随机生成一个［a,b］的整数；random.uniform(a,b）用于随机生成一个［a,b］的小数。本题选择C选项。"
+                },
+                {
+                    "id": "0538",
+                    "title": "0538 - 以下用于计算机视觉领域的Python第三方库是(    )。",
+                    "options": {"A": "opencv-python", "B": "matplotlib", "C": "flask", "D": "pymongo"},
+                    "answer": "A",
+                    "analysis": "opencv-python是图像处理和计算机视觉方向的第三方库，matplotlib是数据可视化方向的第三方库，flask是Web开发方向的第三方库，pymongo是数据存储方向的第三方库。本题选择A选项。"
+                },
+                {
+                    "id": "0539",
+                    "title": "0539 - 以下不属于数据分析领域的Python第三方库是(    )。",
+                    "options": {"A": "pandas", "B": "PyQt5", "C": "NumPy", "D": "seaborn"},
+                    "answer": "B",
+                    "analysis": "PyQt5是用户图形化界面方向的第三方库，pandas、NumPy、seaborn和scipy 都是数据分析方向的第三方库。本题选择B选项。"
+                },
+                {
+                    "id": "0540",
+                    "title": "0540 - 以下不属于人工智能领域的Python第三方库是(    )。",
+                    "options": {"A": "Keras", "B": "pytorch", "C": "mxnet", "D": "pyocr"},
+                    "answer": "D",
+                    "analysis": "pyocr是图像字符识别方向的第三方库，pytorch、mxnet和Keras都属于人工智能领域的第三方库。本题选择D选项。"
+                }
+            ]
+        }
+    }
+
+
+    // 2. 全局变量
+    let currentPaperKey = "paper1"; // 当前选中的套题
+    let currentQuestionBank = allPaperData[currentPaperKey].questions; // 当前套题的题库
+    let currentIndex = 0; // 当前题目索引
+    let userAnswers = JSON.parse(localStorage.getItem("ncreUserAnswers")) || {}; // 本地存储的答题记录
+
+    // 3. 初始化页面
+    function initPage() {
+        // 加载当前套题数据
+        loadPaperData(currentPaperKey);
+        // 绑定所有事件
+        bindAllEvents();
+    }
+
+    // 4. 加载指定套题数据
+    function loadPaperData(paperKey) {
+        currentPaperKey = paperKey;
+        currentQuestionBank = allPaperData[paperKey].questions;
+        currentIndex = 0; // 切换套题后回到第一题
+
+        // 更新页面标题
+        document.querySelector(".title").textContent = `NCRE Level 2 选择题专项训练（${allPaperData[paperKey].name}）`;
+
+        // 生成题号导航
+        renderQuestionNav();
+        // 加载当前题目
+        loadQuestion(currentIndex);
+        // 更新按钮状态
+        updateBtnStatus();
+    }
+
+    // 5. 生成题号导航
+    function renderQuestionNav() {
+        const navContainer = document.getElementById("question-nav");
+        navContainer.innerHTML = "";
+
+        currentQuestionBank.forEach((question, index) => {
+            const navItem = document.createElement("div");
+            navItem.className = "nav-item";
+
+            // 当前题号高亮
+            if (index === currentIndex) {
+                navItem.classList.add("active");
+            }
+
+            // 已答题号标绿
+            if (userAnswers[question.id]) {
+                navItem.classList.add("completed");
+            }
+
+            navItem.textContent = question.id;
+            navItem.dataset.index = index;
+
+            // 点击题号切换题目
+            navItem.addEventListener("click", () => {
+                currentIndex = index;
+                loadQuestion(currentIndex);
+                renderQuestionNav();
+            });
+
+            navContainer.appendChild(navItem);
+        });
+    }
+
+    // 6. 加载题目（修复核心问题：调整逻辑顺序 + 新增图片渲染）
+    function loadQuestion(index) {
+        const question = currentQuestionBank[index];
+        const questionTitle = document.getElementById("question-title");
+        const optionsContainer = document.getElementById("options");
+        const feedback = document.getElementById("feedback");
+        const submitBtn = document.getElementById("submit-btn");
+
+        // 1. 重置所有状态
+        feedback.className = "feedback";
+        feedback.textContent = "";
+        optionsContainer.innerHTML = "";
+        submitBtn.disabled = false; // 先启用提交按钮
+
+        // 2. 更新题目标题：处理代码块和换行符
+        let titleHtml = question.title;
+        titleHtml = titleHtml.replace(/(import turtle as t.*?left\(60\))/s, '<pre><code>$1</code></pre>');
+        titleHtml = titleHtml.replace(/\n/g, '<br>');
+
+        // 新增：如果题目有图片，添加图片元素到标题后
+        if (question.image && question.image.url) {
+            titleHtml += `<div style="margin: 15px 0;">
+                <img src="${question.image.url}"
+                     alt="${question.image.alt || '题目图片'}"
+                     style="width: ${question.image.width || '100%'}; max-width: ${question.image.maxWidth || '800px'}; height: auto; border-radius: 5px;"
+                >
+            </div>`;
+        }
+
+        questionTitle.innerHTML = titleHtml;
+
+        // 3. 生成所有选项
+        for (const [key, value] of Object.entries(question.options)) {
+            const optionItem = document.createElement("li");
+            optionItem.className = "option-item";
+            optionItem.dataset.value = key;
+            optionItem.textContent = `${key}. ${value}`;
+            optionsContainer.appendChild(optionItem);
+        }
+
+        // 4. 恢复用户之前的答题状态（关键：选项生成后再处理状态）
+        if (userAnswers[question.id]) {
+            const selectedValue = userAnswers[question.id].selected;
+            const isCorrect = userAnswers[question.id].isCorrect;
+            const selectedOption = document.querySelector(`.option-item[data-value="${selectedValue}"]`);
+
+            if (selectedOption) {
+                selectedOption.classList.add("selected");
+
+                // 标记对错
+                if (isCorrect) {
+                    selectedOption.classList.add("correct");
+                    feedback.className = "feedback correct";
+                    feedback.textContent = `正确！${question.analysis}`;
+                } else {
+                    selectedOption.classList.add("wrong");
+                    // 高亮正确答案
+                    const correctOption = document.querySelector(`.option-item[data-value="${question.answer}"]`);
+                    if (correctOption) {
+                        correctOption.classList.add("correct");
+                    }
+                    feedback.className = "feedback wrong";
+                    feedback.textContent = `错误！正确答案是${question.answer}。${question.analysis}`;
+                }
+            }
+
+            // 已答题则禁用提交按钮
+            submitBtn.disabled = true;
+        }
+
+        // 更新翻页按钮状态
+        updateBtnStatus();
+    }
+
+    // 7. 绑定所有事件
+    function bindAllEvents() {
+        // 7.1 套题选择下拉框事件
+        document.getElementById("paper-select").addEventListener("change", (e) => {
+            loadPaperData(e.target.value);
+        });
+
+        // 7.2 选项点击事件
+        document.getElementById("options").addEventListener("click", (e) => {
+            if (e.target.classList.contains("option-item")) {
+                // 清空其他选项选中状态
+                document.querySelectorAll(".option-item").forEach(item => {
+                    item.classList.remove("selected");
+                });
+                // 选中当前选项
+                e.target.classList.add("selected");
+            }
+        });
+
+        // 7.3 提交答案事件（含本地存储）
+        document.getElementById("submit-btn").addEventListener("click", () => {
+            const selectedOption = document.querySelector(".option-item.selected");
+            if (!selectedOption) {
+                alert("请选择一个选项！");
+                return;
+            }
+
+            const selectedValue = selectedOption.dataset.value;
+            const currentQuestion = currentQuestionBank[currentIndex];
+            const feedback = document.getElementById("feedback");
+            const isCorrect = selectedValue === currentQuestion.answer;
+
+            // 保存答题记录到本地存储
+            userAnswers[currentQuestion.id] = {
+                selected: selectedValue,
+                isCorrect: isCorrect,
+                answer: currentQuestion.answer
+            };
+            localStorage.setItem("ncreUserAnswers", JSON.stringify(userAnswers));
+
+            // 显示答题反馈
+            if (isCorrect) {
+                selectedOption.classList.add("correct");
+                feedback.className = "feedback correct";
+                feedback.textContent = `正确！${currentQuestion.analysis}`;
+            } else {
+                selectedOption.classList.add("wrong");
+                // 高亮正确答案
+                const correctOption = document.querySelector(`.option-item[data-value="${currentQuestion.answer}"]`);
+                if (correctOption) {
+                    correctOption.classList.add("correct");
+                }
+                feedback.className = "feedback wrong";
+                feedback.textContent = `错误！正确答案是${currentQuestion.answer}。${currentQuestion.analysis}`;
+            }
+
+            // 禁用提交按钮
+            document.getElementById("submit-btn").disabled = true;
+            // 重新渲染导航（标记已答）
+            renderQuestionNav();
+        });
+
+        // 7.4 上一题按钮事件
+        document.getElementById("prev-btn").addEventListener("click", () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadQuestion(currentIndex);
+                renderQuestionNav();
+            }
+        });
+
+        // 7.5 下一题按钮事件
+        document.getElementById("next-btn").addEventListener("click", () => {
+            if (currentIndex < currentQuestionBank.length - 1) {
+                currentIndex++;
+                loadQuestion(currentIndex);
+                renderQuestionNav();
+            } else {
+                alert(`已完成${allPaperData[currentPaperKey].name}所有题目！`);
+            }
+        });
+
+        // 7.6 成绩统计按钮事件
+        document.getElementById("score-btn").addEventListener("click", () => {
+            calculateScore();
+            document.getElementById("score-modal").style.display = "flex";
+        });
+
+        // 7.7 关闭成绩弹窗事件
+        document.getElementById("close-modal").addEventListener("click", () => {
+            document.getElementById("score-modal").style.display = "none";
+        });
+
+        // 点击弹窗外层关闭
+        document.getElementById("score-modal").addEventListener("click", (e) => {
+            if (e.target === document.getElementById("score-modal")) {
+                document.getElementById("score-modal").style.display = "none";
+            }
+        });
+    }
+
+    // 8. 更新按钮状态
+    function updateBtnStatus() {
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+
+        // 上一题按钮：第一题禁用
+        prevBtn.disabled = currentIndex === 0;
+        // 下一题按钮：最后一题禁用
+        nextBtn.disabled = currentIndex === currentQuestionBank.length - 1;
+    }
+
+    // 9. 计算成绩统计
+    function calculateScore() {
+        // 筛选当前套题的答题记录
+        const currentPaperQuestionIds = currentQuestionBank.map(q => q.id);
+        const currentPaperAnswers = Object.entries(userAnswers).filter(([id, _]) => currentPaperQuestionIds.includes(id));
+
+        // 统计数据
+        const total = currentQuestionBank.length;
+        const answered = currentPaperAnswers.length;
+        const correct = currentPaperAnswers.filter(([_, answer]) => answer.isCorrect).length;
+        const correctRate = total > 0 ? ((correct / total) * 100).toFixed(2) : 0;
+
+        // 更新弹窗数据
+        document.getElementById("total-questions").textContent = total;
+        document.getElementById("answered-questions").textContent = answered;
+        document.getElementById("correct-questions").textContent = correct;
+        document.getElementById("correct-rate").textContent = `${correctRate}%`;
+    }
+
+    // 页面加载完成后初始化
+    window.onload = initPage;
+</script>
+</body>
+</html>
